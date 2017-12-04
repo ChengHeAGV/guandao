@@ -309,7 +309,7 @@ namespace guandao
                             writer.WriteElementString("当前值", "1");
                             writer.WriteElementString("设定值", "1");
                         }
-                        else if(i == 96)//站点包含信息数
+                        else if (i == 96)//站点包含信息数
                         {
                             writer.WriteElementString("当前值", "10");
                             writer.WriteElementString("设定值", "10");
@@ -375,15 +375,24 @@ namespace guandao
                             writer.WriteStartElement("参数5");
                             writer.WriteElementString("参数号", "6");
                             writer.WriteElementString("参数名", "动作");
-                            writer.WriteElementString("当前值", "0");
-                            writer.WriteElementString("设定值", "0");
+                            if (j == (length-1))
+                            {
+                                writer.WriteElementString("当前值", "1");
+                                writer.WriteElementString("设定值", "1");
+                            }
+                            else
+                            {
+                                writer.WriteElementString("当前值", "0");
+                                writer.WriteElementString("设定值", "0");
+                            }
+
                             writer.WriteElementString("描述", "0:保持 1:停止 2:前进");
                             writer.WriteEndElement();
 
-                            for (int k = 0; k < 4; k++)
+                            for (int k = 0; k < 5; k++)
                             {
-                                writer.WriteStartElement("参数" + (k + 6).ToString());
-                                writer.WriteElementString("参数号", (k + 7).ToString());
+                                writer.WriteStartElement("参数" + (k + 7).ToString());
+                                writer.WriteElementString("参数号", (k + 8).ToString());
                                 writer.WriteElementString("参数名", "未定义");
                                 writer.WriteElementString("当前值", "0");
                                 writer.WriteElementString("设定值", "0");
