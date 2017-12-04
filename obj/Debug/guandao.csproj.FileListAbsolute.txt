@@ -1,0 +1,9 @@
+C:\Users\Administrator\Desktop\guandao\guandao\bin\Debug\guandao.exe.config
+C:\Users\Administrator\Desktop\guandao\guandao\bin\Debug\guandao.exe
+C:\Users\Administrator\Desktop\guandao\guandao\bin\Debug\guandao.pdb
+C:\Users\Administrator\Desktop\guandao\guandao\obj\Debug\guandao.csprojResolveAssemblyReference.cache
+C:\Users\Administrator\Desktop\guandao\guandao\obj\Debug\guandao.Form1.resources
+C:\Users\Administrator\Desktop\guandao\guandao\obj\Debug\guandao.Properties.Resources.resources
+C:\Users\Administrator\Desktop\guandao\guandao\obj\Debug\guandao.csproj.GenerateResource.Cache
+C:\Users\Administrator\Desktop\guandao\guandao\obj\Debug\guandao.exe
+C:\Users\Administrator\Desktop\guandao\guandao\obj\Debug\guandao.pdb
