@@ -7,3 +7,12 @@ C:\Users\Administrator\Desktop\guandao\guandao\obj\Debug\guandao.Properties.Reso
 C:\Users\Administrator\Desktop\guandao\guandao\obj\Debug\guandao.csproj.GenerateResource.Cache
 C:\Users\Administrator\Desktop\guandao\guandao\obj\Debug\guandao.exe
 C:\Users\Administrator\Desktop\guandao\guandao\obj\Debug\guandao.pdb
+D:\github\winform\guandao\guandao\bin\Debug\guandao.exe.config
+D:\github\winform\guandao\guandao\bin\Debug\guandao.exe
+D:\github\winform\guandao\guandao\bin\Debug\guandao.pdb
+D:\github\winform\guandao\guandao\obj\Debug\guandao.csprojResolveAssemblyReference.cache
+D:\github\winform\guandao\guandao\obj\Debug\guandao.Form1.resources
+D:\github\winform\guandao\guandao\obj\Debug\guandao.Properties.Resources.resources
+D:\github\winform\guandao\guandao\obj\Debug\guandao.csproj.GenerateResource.Cache
+D:\github\winform\guandao\guandao\obj\Debug\guandao.exe
+D:\github\winform\guandao\guandao\obj\Debug\guandao.pdb
