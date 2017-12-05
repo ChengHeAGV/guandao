@@ -16,6 +16,9 @@ namespace guandao
         {
             //图层初始化
             Draw_Init();
+
+            //注册鼠标滚轮事件
+            this.pictureBoxForce.MouseWheel += new MouseEventHandler(pictureBoxForce_MouseWheel);
         }
 
         Size size;
@@ -33,46 +36,25 @@ namespace guandao
         //绘图模式
         bool MapMode = false;
 
+        //捕获值
+        int Grid = 35;//单位，像素
+
+        //缩放时的偏移率
+        float Scale = 0;
 
         //图层初始化
         void Draw_Init()
         {
-            size = pictureBoxForce.Size;
+            //size = pictureBoxBackGround.Size;
             point = new Point[1000];
             NewPoint = new Point[1000];
-            point[0] = new Point(0, size.Height);
+            //point[0] = new Point(0,0);
 
-            #region 背景图层绘制网格
-            Bitmap bmp = new Bitmap(size.Width, size.Height);
-            Graphics g = Graphics.FromImage(bmp);
-            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            label_Grid.Text = "Grid:" + Grid.ToString();
 
-            //画笔为灰色
-            Pen pen = new Pen(Color.LightGray);
-            //画虚线
-            pen.DashStyle = System.Drawing.Drawing2D.DashStyle.DashDotDot;
 
-            //在图片上画线
-            int num = 30;//横线
-            int snap_x = size.Width / num;
-            int snap_y = size.Height / num;
-
-            for (int i = 0; i < num + 1; i++)
-            {
-                g.DrawLine(pen, 0, snap_y * i, size.Width, snap_y * i);//坐标
-            }
-            num = 50;//竖线
-            snap_x = size.Width / num;
-            snap_y = size.Height / num;
-            for (int i = 0; i < num + 1; i++)
-            {
-                g.DrawLine(pen, snap_x * i, 0, snap_x * i, size.Height);//坐标
-            }
-            g.Dispose();
-            pictureBoxBackGround.Image = bmp;
-            pictureBoxBackGround.BackColor = Color.White;
-            #endregion
+            // 背景图层绘制网格
+            Draw_Grid();
 
             #region 表层设置透明
             pictureBoxForce.BackColor = Color.Transparent;
@@ -80,31 +62,106 @@ namespace guandao
             #endregion
         }
 
+        //绘制网格
+        void Draw_Grid()
+        {
+            size = pictureBoxBackGround.Size;
+
+            #region 背景图层绘制网格
+            Bitmap bmp = new Bitmap(size.Width, size.Height);
+            if (Grid >= 10)
+            {
+                Graphics g = Graphics.FromImage(bmp);
+                g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+                //画笔为灰色
+                Pen pen = new Pen(Color.LightGray);
+                //画虚线
+                pen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dot;
+
+                //在图片上画线
+                //横线
+                for (int i = 0; i < size.Height / Grid; i++)
+                {
+                    g.DrawLine(pen, 0, Grid * i, size.Width, Grid * i);
+                }
+                //竖线
+                for (int i = 0; i < size.Width / Grid; i++)
+                {
+                    g.DrawLine(pen, Grid * i, 0, Grid * i, size.Height);
+                }
+                g.Dispose();
+            }
+            pictureBoxBackGround.Image = bmp;
+            pictureBoxBackGround.BackColor = Color.Black;
+            #endregion
+        }
+
+        public void pictureBoxForce_MouseWheel(object sender, MouseEventArgs e)
+        {
+            if (e.Delta > 0)
+            {
+                if (Grid > 5)
+                {
+                    Grid -= 5;
+                }
+                else if (Grid > 1)
+                {
+                    Grid -= 1;
+                }
+            }
+            else
+            {
+                if (Grid < 400)
+                {
+                    if (Grid < 5)
+                    {
+                        Grid += 1;
+                    }
+                    else
+                        Grid += 5;
+                }
+            }
+            label_Grid.Text = "Grid:" + Grid.ToString();
+
+            //更新原点坐标
+            //point[0] = new Point(0, size.Height / Grid);
+
+            //重绘网格
+            Draw_Grid();
+            //重绘线段
+            ReloadUI();
+        }
+
         private void pictureBoxForce_MouseMove(object sender, MouseEventArgs e)
         {
             int x = e.X;
             int y = e.Y;
 
-            #region 计算自动归位坐标
-            //计算最近坐标点
-            int snapx = size.Width / 50;
-            int snapy = size.Height / 30;
+            //计算偏移比例
+            Scale = x / size.Width;
 
-            int xval = x % snapx;
-            int yval = y % snapy;
-            if (xval > (snapx / 2))
-                x += snapx - xval;
+            #region 计算捕获坐标
+            //计算最近坐标点
+            int xval = x % Grid;
+            int yval = y % Grid;
+            if (xval > (Grid / 2))
+                x += Grid - xval;
             else
                 x -= xval;
-            if (yval > (snapy / 2))
-                y += snapy - yval;
+            if (yval > (Grid / 2))
+                y += Grid - yval;
             else
                 y -= yval;
             #endregion
 
-            NowPoint.X = x;
-            NowPoint.Y = y;
+            NowPoint.X = x / Grid;
+            NowPoint.Y = y / Grid;
 
+            //显示坐标到界面
+            label_XY.Text = "X:" + x.ToString() + " Y:" + y.ToString();
+            label_True_XY.Text = "X:" + (NowPoint.X ).ToString() + "CM Y:" + (NowPoint.Y ).ToString()+"CM";
             //重新加载界面
             ReloadUI();
         }
@@ -116,38 +173,33 @@ namespace guandao
 
             MapMode = true;
 
-            #region 计算自动归位坐标
+            #region 计算捕获坐标
             //计算最近坐标点
-            int snapx = size.Width / 50;
-            int snapy = size.Height / 30;
-
-            int xval = x % snapx;
-            int yval = y % snapy;
-            if (xval > (snapx / 2))
-                x += snapx - xval;
+            int xval = x % Grid;
+            int yval = y % Grid;
+            if (xval > (Grid / 2))
+                x += Grid - xval;
             else
                 x -= xval;
-            if (yval > (snapy / 2))
-                y += snapy - yval;
+            if (yval > (Grid / 2))
+                y += Grid - yval;
             else
                 y -= yval;
             #endregion
 
-            NowPoint.X = x;
-            NowPoint.Y = y;
+            NowPoint.X = x / Grid;
+            NowPoint.Y = y / Grid;
 
             if (e.Button == MouseButtons.Left && e.Clicks == 1)
             {
                 //单击了鼠标左键,添加点
-                point[length++] = new Point(x, y);
-                NewPoint[length - 1].X = point[length - 1].X / snapx;
-                NewPoint[length - 1].Y = 30 + 1 - point[length - 1].Y / snapy;
+                point[length++] = new Point(x / Grid, y / Grid);
 
                 textBox1.Text = string.Empty;
                 textBox1.AppendText("point.Length:" + length.ToString() + "\r\n");
                 for (int i = 0; i < length; i++)
                 {
-                    textBox1.AppendText(i.ToString() + " x:" + NewPoint[i].X.ToString() + ",y:" + (NewPoint[i].Y).ToString() + "\r\n");
+                    textBox1.AppendText(i.ToString() + " x:" + point[i].X.ToString() + "CM,y:" + (point[i].Y).ToString() + "CM\r\n");
                 }
             }
             else if (e.Button == MouseButtons.Right && e.Clicks == 1)
@@ -198,11 +250,12 @@ namespace guandao
             }
         }
 
+
         //重新加载界面
         void ReloadUI()
         {
-            int x = NowPoint.X;
-            int y = NowPoint.Y;
+            int x = NowPoint.X * Grid;
+            int y = NowPoint.Y * Grid;
             if (MapMode)
             {
                 Bitmap bmp = new Bitmap(size.Width, size.Height);
@@ -212,7 +265,7 @@ namespace guandao
                 Brush bush = new SolidBrush(Color.Black);//填充的颜色
 
                 //画定位十字线
-                int snap = size.Width / 30;
+                int snap = 50;
                 g.DrawLine(new Pen(Color.DarkCyan, 1), x, y - snap, x, y + snap);//竖线
                 g.DrawLine(new Pen(Color.DarkCyan, 1), x - snap, y, x + snap, y);//横线
 
@@ -226,17 +279,17 @@ namespace guandao
                     for (int i = 0; i < length - 1; i++)
                     {
                         //画已经绘制的线段
-                        g.DrawLine(new Pen(Color.Blue, 3), point[i], point[i + 1]);
+                        g.DrawLine(new Pen(Color.White, 2), point[i].X * Grid, point[i].Y * Grid, point[i + 1].X * Grid, point[i + 1].Y * Grid);
                         //画小叉号
-                        g.DrawLine(new Pen(Color.Gray, 1), point[i].X - snap / 4, point[i].Y - snap / 4, point[i].X + snap / 4, point[i].Y + snap / 4);
-                        g.DrawLine(new Pen(Color.Gray, 1), point[i].X + snap / 4, point[i].Y - snap / 4, point[i].X - snap / 4, point[i].Y + snap / 4);
+                        g.DrawLine(new Pen(Color.Gray, 1), point[i].X * Grid - snap / 4, point[i].Y * Grid - snap / 4, point[i].X * Grid + snap / 4, point[i].Y * Grid + snap / 4);
+                        g.DrawLine(new Pen(Color.Gray, 1), point[i].X * Grid + snap / 4, point[i].Y * Grid - snap / 4, point[i].X * Grid - snap / 4, point[i].Y * Grid + snap / 4);
                     }
                 }
 
                 //画正在绘制的线段
                 if (length >= 1)
                 {
-                    g.DrawLine(new Pen(Color.Blue, 3), point[length - 1], new Point(x, y));
+                    g.DrawLine(new Pen(Color.White, 2), point[length - 1].X * Grid, point[length - 1].Y * Grid, x, y);
                 }
 
                 g.Dispose();
@@ -248,28 +301,27 @@ namespace guandao
                 Graphics g = Graphics.FromImage(bmp);
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
                 g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-                Brush bush = new SolidBrush(Color.Black);//填充的颜色
+                Brush bush = new SolidBrush(Color.Red);//填充的颜色
 
-
+                 int r =6;
                 //画已经绘制的线段
                 if (length >= 2)
                 {
                     for (int i = 0; i < length - 1; i++)
                     {
                         //画已经绘制的线段
-                        g.DrawLine(new Pen(Color.Blue, 3), point[i], point[i + 1]);
+                        g.DrawLine(new Pen(Color.Blue, 3), point[i].X * Grid, point[i].Y * Grid, point[i + 1].X * Grid, point[i + 1].Y * Grid);
 
                         //在拐点处画圆
-                        int r = 8;
-                        g.FillEllipse(bush, point[i].X - r, point[i].Y - r, 2 * r, 2 * r);
+                       
+                        g.FillEllipse(bush, point[i].X * Grid - r, point[i].Y * Grid - r, 2 * r, 2 * r);
                     }
                 }
                 if (length != 0)
                 {
                     //在拐点处画圆
-                    int r = 8;
                     int i = length - 1;
-                    g.FillEllipse(bush, point[i].X - r, point[i].Y - r, 2 * r, 2 * r);
+                    g.FillEllipse(bush, point[i].X * Grid - r, point[i].Y * Grid - r, 2 * r, 2 * r);
                 }
 
                 g.Dispose();
@@ -299,7 +351,7 @@ namespace guandao
 
                     writer.WriteStartElement("系统参数");
                     //加入子元素
-                    for (int i = 0; i < 100; i++)
+                    for (int i = 0; i < 101; i++)
                     {
                         writer.WriteStartElement("参数" + i.ToString());
                         writer.WriteElementString("参数号", i.ToString());
@@ -375,7 +427,7 @@ namespace guandao
                             writer.WriteStartElement("参数5");
                             writer.WriteElementString("参数号", "6");
                             writer.WriteElementString("参数名", "动作");
-                            if (j == (length-1))
+                            if (j == (length - 1))
                             {
                                 writer.WriteElementString("当前值", "1");
                                 writer.WriteElementString("设定值", "1");
@@ -416,6 +468,12 @@ namespace guandao
             {
                 MessageBox.Show("没有路径可保存到PC！", "提示");
             }
+        }
+
+        private void pictureBoxForce_MouseEnter(object sender, EventArgs e)
+        {
+            //控件获取焦点后滚轮事件才有效
+            this.pictureBoxForce.Focus();
         }
     }
 }
