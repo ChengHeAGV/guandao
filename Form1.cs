@@ -98,8 +98,20 @@ namespace guandao
             #endregion
         }
 
+        //改变Grid
+        bool mouseWheel = false;
+
         public void pictureBoxForce_MouseWheel(object sender, MouseEventArgs e)
         {
+
+            int x = e.X;
+            int y = e.Y;
+
+            //计算偏移比例
+            Scale = (float)x / size.Width;
+            mouseWheel = true;
+
+
             if (e.Delta > 0)
             {
                 if (Grid > 5)
@@ -139,9 +151,6 @@ namespace guandao
             int x = e.X;
             int y = e.Y;
 
-            //计算偏移比例
-            Scale = x / size.Width;
-
             #region 计算捕获坐标
             //计算最近坐标点
             int xval = x % Grid;
@@ -161,7 +170,7 @@ namespace guandao
 
             //显示坐标到界面
             label_XY.Text = "X:" + x.ToString() + " Y:" + y.ToString();
-            label_True_XY.Text = "X:" + (NowPoint.X ).ToString() + "CM Y:" + (NowPoint.Y ).ToString()+"CM";
+            label_True_XY.Text = "X:" + (NowPoint.X).ToString() + "CM Y:" + (NowPoint.Y).ToString() + "CM";
             //重新加载界面
             ReloadUI();
         }
@@ -303,27 +312,37 @@ namespace guandao
                 g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
                 Brush bush = new SolidBrush(Color.Red);//填充的颜色
 
-                 int r =6;
+                int r = 6;
                 //画已经绘制的线段
                 if (length >= 2)
                 {
                     for (int i = 0; i < length - 1; i++)
                     {
                         //画已经绘制的线段
-                        g.DrawLine(new Pen(Color.Blue, 3), point[i].X * Grid, point[i].Y * Grid, point[i + 1].X * Grid, point[i + 1].Y * Grid);
-
-                        //在拐点处画圆
-                       
-                        g.FillEllipse(bush, point[i].X * Grid - r, point[i].Y * Grid - r, 2 * r, 2 * r);
+                        if (mouseWheel)
+                        {
+                            g.DrawLine(new Pen(Color.Blue, 3), point[i].X * Grid / Scale, point[i].Y * Grid / Scale, point[i + 1].X * Grid / Scale, point[i + 1].Y * Grid / Scale);
+                            g.FillEllipse(bush, (point[i].X * Grid - r) / Scale, (point[i].Y * Grid - r) / Scale, 2 * r / Scale, 2 * r / Scale);
+                        }
+                        else
+                        {
+                            g.DrawLine(new Pen(Color.Blue, 3), point[i].X * Grid, point[i].Y * Grid, point[i + 1].X * Grid, point[i + 1].Y * Grid);
+                            //在拐点处画圆
+                            g.FillEllipse(bush, point[i].X * Grid - r, point[i].Y * Grid - r, 2 * r, 2 * r);
+                        }
                     }
                 }
                 if (length != 0)
                 {
                     //在拐点处画圆
                     int i = length - 1;
-                    g.FillEllipse(bush, point[i].X * Grid - r, point[i].Y * Grid - r, 2 * r, 2 * r);
-                }
+                    if (mouseWheel)
+                        g.FillEllipse(bush, (point[i].X * Grid - r) / Scale, (point[i].Y * Grid - r) / Scale, 2 * r / Scale, 2 * r / Scale);
+                    else
+                        g.FillEllipse(bush, point[i].X * Grid - r, point[i].Y * Grid - r, 2 * r, 2 * r);
 
+                }
+                mouseWheel = false;
                 g.Dispose();
                 pictureBoxForce.Image = bmp;
             }
