@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
+using System.IO.Ports;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
@@ -13,16 +14,38 @@ namespace guandao
         {
             InitializeComponent();
         }
-
+        private string[] str;
         private void Form1_Load(object sender, EventArgs e)
         {
             //图层初始化
             Draw_Init();
 
             //注册鼠标滚轮事件
-            this.pictureBoxForce.MouseWheel += new MouseEventHandler(pictureBoxForce_MouseWheel);
-
+            this.pictureBox_location.MouseWheel += new MouseEventHandler(pictureBox_location_MouseWheel);
             serialPort1.Open();
+
+            //button1_openclose.Text = "打开串口";
+            //comboBox2_BaudRate.SelectedIndex = 2;
+            //str = SerialPort.GetPortNames();
+            //if (str.Length != 0)
+            //{
+            //    comboBox1_PortName.Items.AddRange(str);
+            //    comboBox1_PortName.SelectedItem = comboBox1_PortName.Items[0];
+
+            //    try
+            //    {
+            //        serialPort1.PortName = comboBox1_PortName.SelectedItem.ToString();
+            //        serialPort1.BaudRate = int.Parse(comboBox2_BaudRate.SelectedItem.ToString());
+            //        serialPort1.Open();
+            //        serialPort1.DataReceived += serialPort1_DataReceived;
+            //        button1_openclose.Text = "关闭串口";
+            //        label5_LED.ForeColor = Color.Red;
+            //    }
+            //    catch (Exception)
+            //    {
+            //        MessageBox.Show("打开串口失败,串口被占用或选择正确的串口!", "错误提示");
+            //    }
+            //}
         }
 
 
@@ -30,8 +53,14 @@ namespace guandao
         //已绘制点坐标集合
         Point[] point;//原始坐标
         Point[] NewPoint;//新坐标
+        Point[] RealPoint;//实时位置
+
+
         //点坐标个数
         int length = 1;
+        //实时点坐标个数
+        int RealLength = 1;
+
         //光标当前位置
         Point NowPoint;
 
@@ -53,7 +82,9 @@ namespace guandao
             //size = pictureBoxBackGround.Size;
             point = new Point[1000];
             NewPoint = new Point[1000];
-            //point[0] = new Point(0,0);
+            RealPoint = new Point[10000];
+            point[0] = new Point(0, 0);
+            RealPoint[0] = new Point(0, 0);
 
             label_Grid.Text = "Grid:" + Grid.ToString();
 
@@ -64,9 +95,12 @@ namespace guandao
             #region 表层设置透明
             pictureBoxForce.BackColor = Color.Transparent;
             pictureBoxForce.Parent = pictureBoxBackGround;
-            pictureBox1.BackColor = Color.Transparent;
-            pictureBox1.Parent = pictureBoxForce;
+
+            pictureBox_location.BackColor = Color.Transparent;
+            pictureBox_location.Parent = pictureBoxForce;
             #endregion
+            //绘制定位圆圈
+            Draw_location(false);
         }
 
         //绘制网格
@@ -74,8 +108,6 @@ namespace guandao
         {
             size = pictureBoxBackGround.Size;
 
-            size.Width += 50;
-            size.Height -= 50;
 
             #region 背景图层绘制网格
             Bitmap bmp = new Bitmap(size.Width, size.Height);
@@ -108,134 +140,38 @@ namespace guandao
             #endregion
         }
 
+        //绘制定位圆圈
+        void Draw_location(bool dis)
+        {
+            int r = 20;
+            Bitmap bmp = new Bitmap(size.Width, size.Height);
+            Graphics g = Graphics.FromImage(bmp);
+            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            Brush bush = new SolidBrush(Color.Orange);//填充的颜色
+            if (dis)
+            {
+                g.FillEllipse(bush, (RealPoint[RealLength - 1].X) * Grid - r / 2, size.Height - (RealPoint[RealLength - 1].Y) * Grid - r / 2, r, r);
+            }
+
+
+            //画已经绘制的线段
+            if (RealLength >= 2)
+            {
+                for (int i = 0; i < RealLength - 1; i++)
+                {
+                    //画已经绘制的线段
+                    g.DrawLine(new Pen(Color.White, 3), RealPoint[i].X * Grid, size.Height - RealPoint[i].Y * Grid, RealPoint[i + 1].X * Grid, size.Height - RealPoint[i + 1].Y * Grid);
+                }
+            }
+
+            g.Dispose();
+            pictureBox_location.Image = bmp;
+        }
+
         //改变Grid
         bool mouseWheel = false;
 
-        public void pictureBoxForce_MouseWheel(object sender, MouseEventArgs e)
-        {
-
-            int x = e.X;
-            int y = e.Y;
-
-            //计算偏移比例
-            Scale = (float)x / size.Width;
-            mouseWheel = true;
-
-
-            if (e.Delta > 0)
-            {
-                if (Grid > 5)
-                {
-                    Grid -= 5;
-                }
-                else if (Grid > 1)
-                {
-                    Grid -= 1;
-                }
-            }
-            else
-            {
-                if (Grid < 400)
-                {
-                    if (Grid < 5)
-                    {
-                        Grid += 1;
-                    }
-                    else
-                        Grid += 5;
-                }
-            }
-            label_Grid.Text = "Grid:" + Grid.ToString();
-
-            //更新原点坐标
-            //point[0] = new Point(0, size.Height / Grid);
-
-            //重绘网格
-            Draw_Grid();
-            //重绘线段
-            ReloadUI();
-        }
-
-        private void pictureBoxForce_MouseMove(object sender, MouseEventArgs e)
-        {
-            int x = e.X;
-            int y = e.Y;
-
-
-
-            #region 计算捕获坐标
-            //计算最近坐标点
-            int xval = x % Grid;
-            int yval = y % Grid;
-            if (xval > (Grid / 2))
-                x += Grid - xval;
-            else
-                x -= xval;
-            if (yval > (Grid / 2))
-                y += Grid - yval;
-            else
-                y -= yval;
-            #endregion
-
-            y = size.Height / Grid - y / Grid + 1;
-            NowPoint.X = x / Grid;
-            NowPoint.Y = y;
-
-            //显示坐标到界面
-            label_XY.Text = "X:" + x.ToString() + " Y:" + y.ToString();
-            label_True_XY.Text = "X:" + (NowPoint.X).ToString() + "CM Y:" + (NowPoint.Y).ToString() + "CM";
-            //重新加载界面
-            ReloadUI();
-        }
-
-        private void pictureBoxForce_MouseClick(object sender, MouseEventArgs e)
-        {
-            int x = e.X;
-            int y = e.Y;
-
-            MapMode = true;
-
-            #region 计算捕获坐标
-            //计算最近坐标点
-            int xval = x % Grid;
-            int yval = y % Grid;
-            if (xval > (Grid / 2))
-                x += Grid - xval;
-            else
-                x -= xval;
-            if (yval > (Grid / 2))
-                y += Grid - yval;
-            else
-                y -= yval;
-            #endregion
-            y = size.Height / Grid - y / Grid + 1;
-            NowPoint.X = x / Grid;
-            NowPoint.Y = y;
-
-            if (e.Button == MouseButtons.Left && e.Clicks == 1)
-            {
-                //单击了鼠标左键,添加点
-                point[length++] = new Point(x / Grid, y);
-
-                textBox1.Text = string.Empty;
-                textBox1.AppendText("point.Length:" + length.ToString() + "\r\n");
-                for (int i = 0; i < length; i++)
-                {
-                    textBox1.AppendText(i.ToString() + " x:" + point[i].X.ToString() + "CM,y:" + (point[i].Y).ToString() + "CM\r\n");
-                }
-
-            }
-            else if (e.Button == MouseButtons.Right && e.Clicks == 1)
-            {
-                //单击了鼠标右键，退出绘图模式
-                MapMode = false;
-                ReloadUI();
-            }
-
-            label1.Text = length.ToString();
-            label2.Text = CancelStep.ToString();
-
-        }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
@@ -367,11 +303,6 @@ namespace guandao
             }
         }
 
-        private void Form1_ResizeEnd(object sender, EventArgs e)
-        {
-
-        }
-
         private void button_saveRoute_Click(object sender, EventArgs e)
         {
             if (length > 1)
@@ -437,16 +368,16 @@ namespace guandao
                             writer.WriteStartElement("参数1");
                             writer.WriteElementString("参数号", "2");
                             writer.WriteElementString("参数名", "X");
-                            writer.WriteElementString("当前值", NewPoint[j].X.ToString());
-                            writer.WriteElementString("设定值", NewPoint[j].X.ToString());
+                            writer.WriteElementString("当前值", point[j].X.ToString());
+                            writer.WriteElementString("设定值", point[j].X.ToString());
                             writer.WriteElementString("描述", "X坐标，单位CM");
                             writer.WriteEndElement();
 
                             writer.WriteStartElement("参数2");
                             writer.WriteElementString("参数号", "3");
                             writer.WriteElementString("参数名", "Y");
-                            writer.WriteElementString("当前值", NewPoint[j].Y.ToString());
-                            writer.WriteElementString("设定值", NewPoint[j].Y.ToString());
+                            writer.WriteElementString("当前值", point[j].Y.ToString());
+                            writer.WriteElementString("设定值", point[j].Y.ToString());
                             writer.WriteElementString("描述", "Y坐标，单位CM");
                             writer.WriteEndElement();
 
@@ -508,18 +439,12 @@ namespace guandao
             }
         }
 
-        private void pictureBoxForce_MouseEnter(object sender, EventArgs e)
-        {
-            //控件获取焦点后滚轮事件才有效
-            this.pictureBoxForce.Focus();
-        }
-
         private void serialPort1_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
             Byte[] InputBuf = new Byte[128];
             try
             {
-                //Thread.Sleep(20);
+                Thread.Sleep(20);
                 serialPort1.Read(InputBuf, 0, serialPort1.BytesToRead);                                //读取缓冲区的数据直到“}”即0x7D为结束符  
                 string str = System.Text.Encoding.Default.GetString(InputBuf);
                 str = str.Replace("\0", "");
@@ -528,33 +453,289 @@ namespace guandao
                 int IndexofA = str.IndexOf("T");
                 int IndexofB = str.IndexOf("W");
                 string Ru = str.Substring(IndexofA + 1, IndexofB - IndexofA - 1);
-
-                int x = int.Parse(Ru.Substring(Ru.IndexOf("x") + 1, Ru.IndexOf("y") - Ru.IndexOf("x") - 1));
-                int y = int.Parse(Ru.Substring(Ru.IndexOf("y") + 1, Ru.Length - Ru.IndexOf("y") - 1));
-
-                //设置坐标
-                if (x < 0)
+                try
                 {
-                    x = 0;
+                    int x = int.Parse(Ru.Substring(Ru.IndexOf("x") + 1, Ru.IndexOf("y") - Ru.IndexOf("x") - 1));
+                    int y = int.Parse(Ru.Substring(Ru.IndexOf("y") + 1, Ru.Length - Ru.IndexOf("y") - 1));
+
+                    //设置坐标
+                    if (x < 0)
+                    {
+                        x = 0;
+                    }
+                    if (y < 0)
+                    {
+                        y = 0;
+                    }
+
+                    this.Invoke(new MethodInvoker(delegate
+                    {
+                        textBox_port.AppendText(str + "\r\n");
+                        textBox_port.AppendText("X:" + x.ToString() + " Y:" + y.ToString() + "\r\n");
+
+
+
+                        //绘制新路线
+                        RealPoint[RealLength].X = x;
+                        RealPoint[RealLength].Y = y;
+
+                        RealLength++;
+
+                        //绘制定位圆圈
+                        Draw_location(true);
+                        // Draw_RealLine();
+                    }));
                 }
-                if (y < 0)
+                catch
                 {
-                    y = 0;
                 }
-
-
-
-                this.Invoke(new MethodInvoker(delegate
-                {
-                    textBox_port.AppendText(str + "\r\n");
-                    textBox_port.AppendText("X:" + x.ToString() + " Y:" + y.ToString() + "\r\n");
-                    pictureBox1.Location = new Point((x+10) * Grid - 17, size.Height - (y+10) * Grid - 17);
-                }));
             }
             catch (TimeoutException ex)         //超时处理  
             {
                 MessageBox.Show(ex.ToString());
             }
+        }
+
+        private void pictureBox_location_MouseMove(object sender, MouseEventArgs e)
+        {
+            int x = e.X;
+            int y = e.Y;
+
+
+
+            #region 计算捕获坐标
+            //计算最近坐标点
+            int xval = x % Grid;
+            int yval = y % Grid;
+            if (xval > (Grid / 2))
+                x += Grid - xval;
+            else
+                x -= xval;
+            if (yval > (Grid / 2))
+                y += Grid - yval;
+            else
+                y -= yval;
+            #endregion
+
+            y = size.Height / Grid - y / Grid;
+            NowPoint.X = x / Grid;
+            NowPoint.Y = y;
+
+            //显示坐标到界面
+            label_XY.Text = "X:" + x.ToString() + " Y:" + y.ToString();
+            label_True_XY.Text = "X:" + (NowPoint.X).ToString() + "CM Y:" + (NowPoint.Y).ToString() + "CM";
+            //重新加载界面
+            ReloadUI();
+
+            //绘制定位圆圈
+            //Draw_location((NowPoint.X) * Grid, size.Height - (NowPoint.Y) * Grid, true);
+        }
+
+        public void pictureBox_location_MouseWheel(object sender, MouseEventArgs e)
+        {
+
+            int x = e.X;
+            int y = e.Y;
+
+            //计算偏移比例
+            Scale = (float)x / size.Width;
+            mouseWheel = true;
+
+
+            if (e.Delta > 0)
+            {
+                if (Grid > 5)
+                {
+                    Grid -= 5;
+                }
+                else if (Grid > 1)
+                {
+                    Grid -= 1;
+                }
+            }
+            else
+            {
+                if (Grid < 400)
+                {
+                    if (Grid < 5)
+                    {
+                        Grid += 1;
+                    }
+                    else
+                        Grid += 5;
+                }
+            }
+            label_Grid.Text = "Grid:" + Grid.ToString();
+
+            //更新原点坐标
+            //point[0] = new Point(0, size.Height / Grid);
+
+            //重绘网格
+            Draw_Grid();
+            //重绘线段
+            ReloadUI();
+
+            //绘制实际路线
+            Draw_location(true);
+        }
+
+        private void pictureBox_location_MouseClick(object sender, MouseEventArgs e)
+        {
+            int x = e.X;
+            int y = e.Y;
+
+            MapMode = true;
+
+            #region 计算捕获坐标
+            //计算最近坐标点
+            int xval = x % Grid;
+            int yval = y % Grid;
+            if (xval > (Grid / 2))
+                x += Grid - xval;
+            else
+                x -= xval;
+            if (yval > (Grid / 2))
+                y += Grid - yval;
+            else
+                y -= yval;
+            #endregion
+            y = size.Height / Grid - y / Grid;
+            NowPoint.X = x / Grid;
+            NowPoint.Y = y;
+
+            if (e.Button == MouseButtons.Left && e.Clicks == 1)
+            {
+                //单击了鼠标左键,添加点
+                point[length++] = new Point(x / Grid, y);
+
+                textBox1.Text = string.Empty;
+                textBox1.AppendText("point.Length:" + length.ToString() + "\r\n");
+                for (int i = 0; i < length; i++)
+                {
+                    textBox1.AppendText(i.ToString() + " x:" + point[i].X.ToString() + "CM,y:" + (point[i].Y).ToString() + "CM\r\n");
+                }
+
+            }
+            else if (e.Button == MouseButtons.Right && e.Clicks == 1)
+            {
+                //单击了鼠标右键，退出绘图模式
+                MapMode = false;
+                ReloadUI();
+            }
+
+            label1.Text = length.ToString();
+            label2.Text = CancelStep.ToString();
+        }
+
+        private void pictureBox_location_MouseEnter(object sender, EventArgs e)
+        {
+            //控件获取焦点后滚轮事件才有效
+            this.pictureBox_location.Focus();
+        }
+
+        private void button1_openclose_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (button1_openclose.Text == "打开串口")
+                {
+                    serialPort1.PortName = comboBox1_PortName.SelectedItem.ToString();
+                    serialPort1.BaudRate = int.Parse(comboBox2_BaudRate.SelectedItem.ToString());
+                    serialPort1.Open();
+                    serialPort1.DataReceived += serialPort1_DataReceived;
+                    button1_openclose.Text = "关闭串口";
+                    label5_LED.ForeColor = Color.Red;
+                }
+                else
+                {
+                    serialPort1.Close();
+                    button1_openclose.Text = "打开串口";
+                    label5_LED.ForeColor = Color.Black;
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("打开串口失败,串口被占用或选择正确的串口!", "错误提示");
+            }
+        }
+
+        private void comboBox2_BaudRate_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            serialPort1.BaudRate = int.Parse(comboBox2_BaudRate.SelectedItem.ToString());
+        }
+
+        private void comboBox1_PortName_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            if (serialPort1.IsOpen)
+            {
+                serialPort1.Close();
+                try
+                {
+                    serialPort1.PortName = comboBox1_PortName.SelectedItem.ToString();
+                    serialPort1.Open();
+                }
+                catch (Exception)
+                {
+                    serialPort1.Close();
+                    button1_openclose.Text = "打开串口";
+                    label5_LED.ForeColor = Color.Black;
+                    MessageBox.Show("打开串口失败,串口被占用或选择正确的串口!", "错误提示");
+                }
+            }
+        }
+
+        private void button_loadmap_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog file = new OpenFileDialog();
+            file.Filter = "文本文件|*.xml";
+            if (file.ShowDialog() == DialogResult.OK)
+            {
+                ////清空子节点
+                //node_parment.Nodes.Clear();
+                //node_lujingparment.Nodes.Clear();
+
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(file.FileName);
+
+                XmlNode xn = xmlDoc.SelectSingleNode("Flash参数");
+
+                XmlNodeList xnn = xn.ChildNodes;
+
+                int j = 0, m = 0;
+                foreach (XmlNode xnk in xnn)
+                {
+
+                    if (xnk.Name == "路径参数")
+                    {
+                        j = 0; length = 0;
+                        XmlElement xe = (XmlElement)xnk;
+                        XmlNodeList xnm = xe.ChildNodes;
+                        foreach (XmlNode xnkk in xnm)
+                        {
+                            XmlElement xee = (XmlElement)xnkk;
+                            XmlNodeList xng = xee.ChildNodes;
+                            foreach (XmlNode xnkkk in xng)
+                            {
+                                point[length].X = int.Parse(xnkkk.ChildNodes[1].ChildNodes.Item(3).InnerText.ToString());
+                                point[length].Y = int.Parse(xnkkk.ChildNodes[2].ChildNodes.Item(3).InnerText.ToString());
+                                length++;
+                            }
+                            j++;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void button_Clear_Click(object sender, EventArgs e)
+        {
+            length = 1;
+            RealLength = 1;
+            //重新加载界面
+            ReloadUI();
+
+            //绘制实际路线
+            Draw_location(false);
         }
     }
 }
