@@ -28,24 +28,26 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.pictureBoxForce = new System.Windows.Forms.PictureBox();
-            this.pictureBoxBackGround = new System.Windows.Forms.PictureBox();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.label_True_XY = new System.Windows.Forms.Label();
             this.button_saveRoute = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
-            this.label_XY = new System.Windows.Forms.Label();
             this.label_Grid = new System.Windows.Forms.Label();
-            this.label_True_XY = new System.Windows.Forms.Label();
+            this.label_XY = new System.Windows.Forms.Label();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.pictureBoxForce = new System.Windows.Forms.PictureBox();
+            this.pictureBoxBackGround = new System.Windows.Forms.PictureBox();
+            this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
+            this.textBox_port = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxForce)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxBackGround)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
@@ -54,6 +56,9 @@
             this.splitContainer3.Panel1.SuspendLayout();
             this.splitContainer3.Panel2.SuspendLayout();
             this.splitContainer3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxForce)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxBackGround)).BeginInit();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -64,6 +69,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.pictureBox1);
             this.splitContainer1.Panel1.Controls.Add(this.pictureBoxForce);
             this.splitContainer1.Panel1.Controls.Add(this.pictureBoxBackGround);
             // 
@@ -73,29 +79,6 @@
             this.splitContainer1.Size = new System.Drawing.Size(1471, 728);
             this.splitContainer1.SplitterDistance = 1169;
             this.splitContainer1.TabIndex = 0;
-            // 
-            // pictureBoxForce
-            // 
-            this.pictureBoxForce.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBoxForce.Location = new System.Drawing.Point(0, 0);
-            this.pictureBoxForce.Name = "pictureBoxForce";
-            this.pictureBoxForce.Size = new System.Drawing.Size(1169, 728);
-            this.pictureBoxForce.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBoxForce.TabIndex = 1;
-            this.pictureBoxForce.TabStop = false;
-            this.pictureBoxForce.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBoxForce_MouseClick);
-            this.pictureBoxForce.MouseEnter += new System.EventHandler(this.pictureBoxForce_MouseEnter);
-            this.pictureBoxForce.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBoxForce_MouseMove);
-            // 
-            // pictureBoxBackGround
-            // 
-            this.pictureBoxBackGround.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBoxBackGround.Location = new System.Drawing.Point(0, 0);
-            this.pictureBoxBackGround.Name = "pictureBoxBackGround";
-            this.pictureBoxBackGround.Size = new System.Drawing.Size(1169, 728);
-            this.pictureBoxBackGround.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBoxBackGround.TabIndex = 0;
-            this.pictureBoxBackGround.TabStop = false;
             // 
             // splitContainer2
             // 
@@ -110,6 +93,7 @@
             // 
             // splitContainer2.Panel2
             // 
+            this.splitContainer2.Panel2.Controls.Add(this.textBox_port);
             this.splitContainer2.Panel2.Controls.Add(this.label_True_XY);
             this.splitContainer2.Panel2.Controls.Add(this.button_saveRoute);
             this.splitContainer2.Size = new System.Drawing.Size(298, 728);
@@ -128,9 +112,20 @@
             this.textBox1.TabIndex = 1;
             this.textBox1.WordWrap = false;
             // 
+            // label_True_XY
+            // 
+            this.label_True_XY.AutoSize = true;
+            this.label_True_XY.Font = new System.Drawing.Font("宋体", 18F);
+            this.label_True_XY.Location = new System.Drawing.Point(19, 17);
+            this.label_True_XY.Name = "label_True_XY";
+            this.label_True_XY.Size = new System.Drawing.Size(166, 24);
+            this.label_True_XY.TabIndex = 5;
+            this.label_True_XY.Text = "X:8888 Y:8888";
+            this.label_True_XY.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // button_saveRoute
             // 
-            this.button_saveRoute.Location = new System.Drawing.Point(22, 107);
+            this.button_saveRoute.Location = new System.Drawing.Point(23, 65);
             this.button_saveRoute.Name = "button_saveRoute";
             this.button_saveRoute.Size = new System.Drawing.Size(107, 62);
             this.button_saveRoute.TabIndex = 2;
@@ -179,6 +174,16 @@
             this.splitContainer3.SplitterDistance = 728;
             this.splitContainer3.TabIndex = 1;
             // 
+            // label_Grid
+            // 
+            this.label_Grid.AutoSize = true;
+            this.label_Grid.Font = new System.Drawing.Font("宋体", 12F);
+            this.label_Grid.Location = new System.Drawing.Point(131, 18);
+            this.label_Grid.Name = "label_Grid";
+            this.label_Grid.Size = new System.Drawing.Size(56, 16);
+            this.label_Grid.TabIndex = 4;
+            this.label_Grid.Text = "Grid:5";
+            // 
             // label_XY
             // 
             this.label_XY.AutoSize = true;
@@ -190,26 +195,59 @@
             this.label_XY.Text = "X:8888 Y:8888";
             this.label_XY.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // label_Grid
+            // pictureBox1
             // 
-            this.label_Grid.AutoSize = true;
-            this.label_Grid.Font = new System.Drawing.Font("宋体", 12F);
-            this.label_Grid.Location = new System.Drawing.Point(131, 18);
-            this.label_Grid.Name = "label_Grid";
-            this.label_Grid.Size = new System.Drawing.Size(56, 16);
-            this.label_Grid.TabIndex = 4;
-            this.label_Grid.Text = "Grid:5";
+            this.pictureBox1.BackColor = System.Drawing.Color.Transparent;
+            this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.pictureBox1.Image = global::guandao.Properties.Resources.demo1;
+            this.pictureBox1.Location = new System.Drawing.Point(543, 283);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(35, 35);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBox1.TabIndex = 6;
+            this.pictureBox1.TabStop = false;
             // 
-            // label_True_XY
+            // pictureBoxForce
             // 
-            this.label_True_XY.AutoSize = true;
-            this.label_True_XY.Font = new System.Drawing.Font("宋体", 18F);
-            this.label_True_XY.Location = new System.Drawing.Point(19, 17);
-            this.label_True_XY.Name = "label_True_XY";
-            this.label_True_XY.Size = new System.Drawing.Size(166, 24);
-            this.label_True_XY.TabIndex = 5;
-            this.label_True_XY.Text = "X:8888 Y:8888";
-            this.label_True_XY.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.pictureBoxForce.BackColor = System.Drawing.Color.Transparent;
+            this.pictureBoxForce.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBoxForce.Location = new System.Drawing.Point(0, 0);
+            this.pictureBoxForce.Name = "pictureBoxForce";
+            this.pictureBoxForce.Size = new System.Drawing.Size(1169, 728);
+            this.pictureBoxForce.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBoxForce.TabIndex = 1;
+            this.pictureBoxForce.TabStop = false;
+            this.pictureBoxForce.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBoxForce_MouseClick);
+            this.pictureBoxForce.MouseEnter += new System.EventHandler(this.pictureBoxForce_MouseEnter);
+            this.pictureBoxForce.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBoxForce_MouseMove);
+            // 
+            // pictureBoxBackGround
+            // 
+            this.pictureBoxBackGround.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBoxBackGround.Location = new System.Drawing.Point(0, 0);
+            this.pictureBoxBackGround.Name = "pictureBoxBackGround";
+            this.pictureBoxBackGround.Size = new System.Drawing.Size(1169, 728);
+            this.pictureBoxBackGround.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBoxBackGround.TabIndex = 0;
+            this.pictureBoxBackGround.TabStop = false;
+            // 
+            // serialPort1
+            // 
+            this.serialPort1.BaudRate = 115200;
+            this.serialPort1.PortName = "COM4";
+            this.serialPort1.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort1_DataReceived);
+            // 
+            // textBox_port
+            // 
+            this.textBox_port.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.textBox_port.Font = new System.Drawing.Font("宋体", 25F);
+            this.textBox_port.Location = new System.Drawing.Point(0, 175);
+            this.textBox_port.Multiline = true;
+            this.textBox_port.Name = "textBox_port";
+            this.textBox_port.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.textBox_port.Size = new System.Drawing.Size(298, 186);
+            this.textBox_port.TabIndex = 6;
+            this.textBox_port.WordWrap = false;
             // 
             // Form1
             // 
@@ -225,11 +263,10 @@
             this.ResizeEnd += new System.EventHandler(this.Form1_ResizeEnd);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxForce)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxBackGround)).EndInit();
             this.splitContainer2.Panel1.ResumeLayout(false);
             this.splitContainer2.Panel1.PerformLayout();
             this.splitContainer2.Panel2.ResumeLayout(false);
@@ -241,6 +278,9 @@
             this.splitContainer3.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
             this.splitContainer3.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxForce)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxBackGround)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -259,6 +299,9 @@
         private System.Windows.Forms.Label label_Grid;
         private System.Windows.Forms.Label label_XY;
         private System.Windows.Forms.Label label_True_XY;
+        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.IO.Ports.SerialPort serialPort1;
+        private System.Windows.Forms.TextBox textBox_port;
     }
 }
 

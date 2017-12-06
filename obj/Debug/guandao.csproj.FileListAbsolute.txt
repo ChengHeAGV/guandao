@@ -16,3 +16,8 @@ D:\github\winform\guandao\guandao\obj\Debug\guandao.Properties.Resources.resourc
 D:\github\winform\guandao\guandao\obj\Debug\guandao.csproj.GenerateResource.Cache
 D:\github\winform\guandao\guandao\obj\Debug\guandao.exe
 D:\github\winform\guandao\guandao\obj\Debug\guandao.pdb
+D:\github\winform\guandao\guandao\bin\Debug\Interop.ShockwaveFlashObjects.dll
+D:\github\winform\guandao\guandao\bin\Debug\AxInterop.ShockwaveFlashObjects.dll
+D:\github\winform\guandao\guandao\obj\Debug\Interop.ShockwaveFlashObjects.dll
+D:\github\winform\guandao\guandao\obj\Debug\AxInterop.ShockwaveFlashObjects.dll
+D:\github\winform\guandao\guandao\obj\Debug\guandao.csproj.ResolveComReference.cache
