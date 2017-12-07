@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.IO.Ports;
@@ -14,7 +15,8 @@ namespace guandao
         {
             InitializeComponent();
         }
-        private string[] str;
+
+
         private void Form1_Load(object sender, EventArgs e)
         {
             //图层初始化
@@ -22,32 +24,46 @@ namespace guandao
 
             //注册鼠标滚轮事件
             this.pictureBox_location.MouseWheel += new MouseEventHandler(pictureBox_location_MouseWheel);
-            serialPort1.Open();
+            dataGridView_Draw.DataSource = DrawPointList.ToArray();
+            
+            #region 串口初始化
+            button1_openclose.Text = "打开串口";
+            if (Ini.Read("串口配置", "BaudRate") != "null")
+                comboBox2_BaudRate.SelectedIndex = int.Parse(Ini.Read("串口配置", "BaudRate"));
+            else
+                comboBox2_BaudRate.SelectedIndex = 2;
 
-            //button1_openclose.Text = "打开串口";
-            //comboBox2_BaudRate.SelectedIndex = 2;
-            //str = SerialPort.GetPortNames();
-            //if (str.Length != 0)
-            //{
-            //    comboBox1_PortName.Items.AddRange(str);
-            //    comboBox1_PortName.SelectedItem = comboBox1_PortName.Items[0];
+            string[] str;
 
-            //    try
-            //    {
-            //        serialPort1.PortName = comboBox1_PortName.SelectedItem.ToString();
-            //        serialPort1.BaudRate = int.Parse(comboBox2_BaudRate.SelectedItem.ToString());
-            //        serialPort1.Open();
-            //        serialPort1.DataReceived += serialPort1_DataReceived;
-            //        button1_openclose.Text = "关闭串口";
-            //        label5_LED.ForeColor = Color.Red;
-            //    }
-            //    catch (Exception)
-            //    {
-            //        MessageBox.Show("打开串口失败,串口被占用或选择正确的串口!", "错误提示");
-            //    }
-            //}
+            str = SerialPort.GetPortNames();
+            if (str.Length != 0)
+            {
+                comboBox1_PortName.Items.AddRange(str);
+                try
+                {
+                    if (Ini.Read("串口配置", "PortName") != "null")
+                    {
+                        serialPort1.PortName = Ini.Read("串口配置", "PortName");
+                        comboBox1_PortName.SelectedItem = serialPort1.PortName;
+                    }
+                    else
+                    {
+                        serialPort1.PortName = comboBox1_PortName.SelectedItem.ToString();
+                    }
+
+                    serialPort1.BaudRate = int.Parse(comboBox2_BaudRate.SelectedItem.ToString());
+                    serialPort1.Open();
+                    serialPort1.DataReceived += serialPort1_DataReceived;
+                    button1_openclose.Text = "关闭串口";
+                    label5_LED.ForeColor = Color.Red;
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("打开串口失败,串口被占用或选择正确的串口!", "错误提示");
+                }
+            }
+            #endregion
         }
-
 
         Size size;
         //已绘制点坐标集合
@@ -55,6 +71,10 @@ namespace guandao
         Point[] NewPoint;//新坐标
         Point[] RealPoint;//实时位置
 
+        //绘制的坐标集合
+        List<Point> DrawPointList = new List<Point>();
+        //撤销的坐标集合
+        List<Point> DrawPointListDelete = new List<Point>();
 
         //点坐标个数
         int length = 1;
@@ -79,7 +99,9 @@ namespace guandao
         //图层初始化
         void Draw_Init()
         {
-            //size = pictureBoxBackGround.Size;
+            //初始化坐标集合，添加原点坐标
+            DrawPointList.Add(new Point(0, 0));
+
             point = new Point[1000];
             NewPoint = new Point[1000];
             RealPoint = new Point[10000];
@@ -172,17 +194,28 @@ namespace guandao
         //改变Grid
         bool mouseWheel = false;
 
-
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Control && e.Shift && e.KeyCode == Keys.Z)
             {
                 //恢复撤销
-                if (CancelStep > 1)
+                if (CancelStep > 0)
                 {
                     CancelStep--;
                     length++;
+
+                    //将准备恢复的坐标赋给坐标集合
+                    DrawPointList.Add(DrawPointListDelete[DrawPointListDelete.Count - 1]);
+                    //删除最后一个坐标
+                    DrawPointListDelete.RemoveAt(DrawPointListDelete.Count - 1);
+                    //更新DataGridView显示
+                    dataGridView_Draw.DataSource = DrawPointList.ToArray();
+                    dataGridView_DrawDelete.DataSource = DrawPointListDelete.ToArray();
+
+
+                    //重绘界面
                     ReloadUI();
+
                     label1.Text = length.ToString();
                     label2.Text = CancelStep.ToString();
                 }
@@ -201,14 +234,21 @@ namespace guandao
                 {
                     length--;
                     CancelStep++;
-                    //重新加载界面
+                    //将准备删除的坐标赋给撤销集合
+                    DrawPointListDelete.Add(DrawPointList[DrawPointList.Count - 1]);
+                    //删除最后一个坐标
+                    DrawPointList.RemoveAt(DrawPointList.Count - 1);
+                    //更新DataGridView显示
+                    dataGridView_Draw.DataSource = DrawPointList.ToArray();
+                    dataGridView_DrawDelete.DataSource = DrawPointListDelete.ToArray();
+
+                    //重绘界面
                     ReloadUI();
                     label1.Text = length.ToString();
                     label2.Text = CancelStep.ToString();
                 }
             }
         }
-
 
         //重新加载界面
         void ReloadUI()
@@ -444,7 +484,7 @@ namespace guandao
             Byte[] InputBuf = new Byte[128];
             try
             {
-                Thread.Sleep(20);
+                Thread.Sleep(30);
                 serialPort1.Read(InputBuf, 0, serialPort1.BytesToRead);                                //读取缓冲区的数据直到“}”即0x7D为结束符  
                 string str = System.Text.Encoding.Default.GetString(InputBuf);
                 str = str.Replace("\0", "");
@@ -452,9 +492,9 @@ namespace guandao
                 //获取有效坐标
                 int IndexofA = str.IndexOf("T");
                 int IndexofB = str.IndexOf("W");
-                string Ru = str.Substring(IndexofA + 1, IndexofB - IndexofA - 1);
-                try
+                if (IndexofA != -1 && IndexofB != -1)
                 {
+                    string Ru = str.Substring(IndexofA + 1, IndexofB - IndexofA - 1);
                     int x = int.Parse(Ru.Substring(Ru.IndexOf("x") + 1, Ru.IndexOf("y") - Ru.IndexOf("x") - 1));
                     int y = int.Parse(Ru.Substring(Ru.IndexOf("y") + 1, Ru.Length - Ru.IndexOf("y") - 1));
 
@@ -485,9 +525,6 @@ namespace guandao
                         Draw_location(true);
                         // Draw_RealLine();
                     }));
-                }
-                catch
-                {
                 }
             }
             catch (TimeoutException ex)         //超时处理  
@@ -605,7 +642,9 @@ namespace guandao
 
             if (e.Button == MouseButtons.Left && e.Clicks == 1)
             {
-                //单击了鼠标左键,添加点
+                //单击了鼠标左键,添加坐标到坐标集合
+                DrawPointList.Add(NowPoint);
+                dataGridView_Draw.DataSource= DrawPointList.ToArray();
                 point[length++] = new Point(x / Grid, y);
 
                 textBox1.Text = string.Empty;
@@ -662,6 +701,8 @@ namespace guandao
         private void comboBox2_BaudRate_SelectionChangeCommitted(object sender, EventArgs e)
         {
             serialPort1.BaudRate = int.Parse(comboBox2_BaudRate.SelectedItem.ToString());
+            //存储PortName
+            Ini.Write("串口配置", "BaudRate", comboBox2_BaudRate.SelectedIndex.ToString());
         }
 
         private void comboBox1_PortName_SelectionChangeCommitted(object sender, EventArgs e)
@@ -673,6 +714,9 @@ namespace guandao
                 {
                     serialPort1.PortName = comboBox1_PortName.SelectedItem.ToString();
                     serialPort1.Open();
+
+                    //存储PortName
+                    Ini.Write("串口配置", "PortName", serialPort1.PortName);
                 }
                 catch (Exception)
                 {
@@ -736,6 +780,25 @@ namespace guandao
 
             //绘制实际路线
             Draw_location(false);
+        }
+
+        //手动添加坐标
+        private void button_add_point_Click(object sender, EventArgs e)
+        {
+            //添加点
+            int x = int.Parse(textBox_AddX.Text.Trim());
+            int y = int.Parse(textBox_AddY.Text.Trim());
+
+            point[length++] = new Point(x, y);
+
+            textBox1.Text = string.Empty;
+            textBox1.AppendText("point.Length:" + length.ToString() + "\r\n");
+            for (int i = 0; i < length; i++)
+            {
+                textBox1.AppendText(i.ToString() + " x:" + point[i].X.ToString() + "CM,y:" + (point[i].Y).ToString() + "CM\r\n");
+            }
+            //更新界面
+            ReloadUI();
         }
     }
 }

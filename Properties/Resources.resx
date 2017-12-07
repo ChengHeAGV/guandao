@@ -121,10 +121,4 @@
   <data name="c9d4cf43ad4bd113378d07625cafa40f4afb05da" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\c9d4cf43ad4bd113378d07625cafa40f4afb05da.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="demo" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\Debug\demo.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="demo1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\Debug\demo.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
 </root>

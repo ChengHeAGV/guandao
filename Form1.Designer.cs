@@ -35,23 +35,32 @@
             this.pictureBoxBackGround = new System.Windows.Forms.PictureBox();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.button_add_point = new System.Windows.Forms.Button();
+            this.label6 = new System.Windows.Forms.Label();
+            this.button_Clear = new System.Windows.Forms.Button();
+            this.button_loadmap = new System.Windows.Forms.Button();
+            this.label5 = new System.Windows.Forms.Label();
             this.textBox_port = new System.Windows.Forms.TextBox();
-            this.label_True_XY = new System.Windows.Forms.Label();
+            this.textBox_AddY = new System.Windows.Forms.TextBox();
             this.button_saveRoute = new System.Windows.Forms.Button();
+            this.textBox_AddX = new System.Windows.Forms.TextBox();
+            this.label_True_XY = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
+            this.label5_LED = new System.Windows.Forms.Label();
+            this.button1_openclose = new System.Windows.Forms.Button();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.comboBox2_BaudRate = new System.Windows.Forms.ComboBox();
+            this.comboBox1_PortName = new System.Windows.Forms.ComboBox();
             this.label_Grid = new System.Windows.Forms.Label();
             this.label_XY = new System.Windows.Forms.Label();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
-            this.label5_LED = new System.Windows.Forms.Label();
-            this.button1_openclose = new System.Windows.Forms.Button();
-            this.label3 = new System.Windows.Forms.Label();
-            this.comboBox2_BaudRate = new System.Windows.Forms.ComboBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.comboBox1_PortName = new System.Windows.Forms.ComboBox();
-            this.button_loadmap = new System.Windows.Forms.Button();
-            this.button_Clear = new System.Windows.Forms.Button();
+            this.dataGridView_Draw = new System.Windows.Forms.DataGridView();
+            this.form1BindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.form1BindingSource1 = new System.Windows.Forms.BindingSource(this.components);
+            this.dataGridView_DrawDelete = new System.Windows.Forms.DataGridView();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -67,6 +76,10 @@
             this.splitContainer3.Panel1.SuspendLayout();
             this.splitContainer3.Panel2.SuspendLayout();
             this.splitContainer3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Draw)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.form1BindingSource)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.form1BindingSource1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_DrawDelete)).BeginInit();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -136,13 +149,19 @@
             // 
             // splitContainer2.Panel2
             // 
+            this.splitContainer2.Panel2.Controls.Add(this.dataGridView_DrawDelete);
+            this.splitContainer2.Panel2.Controls.Add(this.dataGridView_Draw);
+            this.splitContainer2.Panel2.Controls.Add(this.button_add_point);
+            this.splitContainer2.Panel2.Controls.Add(this.label6);
             this.splitContainer2.Panel2.Controls.Add(this.button_Clear);
             this.splitContainer2.Panel2.Controls.Add(this.button_loadmap);
+            this.splitContainer2.Panel2.Controls.Add(this.label5);
             this.splitContainer2.Panel2.Controls.Add(this.textBox_port);
-            this.splitContainer2.Panel2.Controls.Add(this.label_True_XY);
+            this.splitContainer2.Panel2.Controls.Add(this.textBox_AddY);
             this.splitContainer2.Panel2.Controls.Add(this.button_saveRoute);
+            this.splitContainer2.Panel2.Controls.Add(this.textBox_AddX);
             this.splitContainer2.Size = new System.Drawing.Size(298, 728);
-            this.splitContainer2.SplitterDistance = 363;
+            this.splitContainer2.SplitterDistance = 235;
             this.splitContainer2.TabIndex = 1;
             // 
             // textBox1
@@ -153,42 +172,113 @@
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox1.Size = new System.Drawing.Size(298, 363);
+            this.textBox1.Size = new System.Drawing.Size(298, 235);
             this.textBox1.TabIndex = 1;
             this.textBox1.WordWrap = false;
             // 
+            // button_add_point
+            // 
+            this.button_add_point.Location = new System.Drawing.Point(219, 114);
+            this.button_add_point.Name = "button_add_point";
+            this.button_add_point.Size = new System.Drawing.Size(67, 35);
+            this.button_add_point.TabIndex = 13;
+            this.button_add_point.Text = "添加坐标";
+            this.button_add_point.UseVisualStyleBackColor = true;
+            this.button_add_point.Click += new System.EventHandler(this.button_add_point_Click);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("宋体", 18F);
+            this.label6.Location = new System.Drawing.Point(116, 117);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(34, 24);
+            this.label6.TabIndex = 12;
+            this.label6.Text = "Y:";
+            this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // button_Clear
+            // 
+            this.button_Clear.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.button_Clear.Location = new System.Drawing.Point(0, 360);
+            this.button_Clear.Name = "button_Clear";
+            this.button_Clear.Size = new System.Drawing.Size(298, 43);
+            this.button_Clear.TabIndex = 8;
+            this.button_Clear.Text = "清除地图";
+            this.button_Clear.UseVisualStyleBackColor = true;
+            this.button_Clear.Click += new System.EventHandler(this.button_Clear_Click);
+            // 
+            // button_loadmap
+            // 
+            this.button_loadmap.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.button_loadmap.Location = new System.Drawing.Point(0, 403);
+            this.button_loadmap.Name = "button_loadmap";
+            this.button_loadmap.Size = new System.Drawing.Size(298, 43);
+            this.button_loadmap.TabIndex = 7;
+            this.button_loadmap.Text = "加载路径";
+            this.button_loadmap.UseVisualStyleBackColor = true;
+            this.button_loadmap.Click += new System.EventHandler(this.button_loadmap_Click);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("宋体", 18F);
+            this.label5.Location = new System.Drawing.Point(22, 117);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(34, 24);
+            this.label5.TabIndex = 11;
+            this.label5.Text = "X:";
+            this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // textBox_port
             // 
-            this.textBox_port.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.textBox_port.Dock = System.Windows.Forms.DockStyle.Top;
             this.textBox_port.Font = new System.Drawing.Font("宋体", 25F);
-            this.textBox_port.Location = new System.Drawing.Point(0, 175);
+            this.textBox_port.Location = new System.Drawing.Point(0, 0);
             this.textBox_port.Multiline = true;
             this.textBox_port.Name = "textBox_port";
             this.textBox_port.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox_port.Size = new System.Drawing.Size(298, 186);
+            this.textBox_port.Size = new System.Drawing.Size(298, 108);
             this.textBox_port.TabIndex = 6;
             this.textBox_port.WordWrap = false;
+            // 
+            // textBox_AddY
+            // 
+            this.textBox_AddY.Font = new System.Drawing.Font("宋体", 18F);
+            this.textBox_AddY.Location = new System.Drawing.Point(156, 114);
+            this.textBox_AddY.Name = "textBox_AddY";
+            this.textBox_AddY.Size = new System.Drawing.Size(55, 35);
+            this.textBox_AddY.TabIndex = 10;
+            // 
+            // button_saveRoute
+            // 
+            this.button_saveRoute.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.button_saveRoute.Location = new System.Drawing.Point(0, 446);
+            this.button_saveRoute.Name = "button_saveRoute";
+            this.button_saveRoute.Size = new System.Drawing.Size(298, 43);
+            this.button_saveRoute.TabIndex = 2;
+            this.button_saveRoute.Text = "保存路径";
+            this.button_saveRoute.UseVisualStyleBackColor = true;
+            this.button_saveRoute.Click += new System.EventHandler(this.button_saveRoute_Click);
+            // 
+            // textBox_AddX
+            // 
+            this.textBox_AddX.Font = new System.Drawing.Font("宋体", 18F);
+            this.textBox_AddX.Location = new System.Drawing.Point(59, 114);
+            this.textBox_AddX.Name = "textBox_AddX";
+            this.textBox_AddX.Size = new System.Drawing.Size(55, 35);
+            this.textBox_AddX.TabIndex = 9;
             // 
             // label_True_XY
             // 
             this.label_True_XY.AutoSize = true;
             this.label_True_XY.Font = new System.Drawing.Font("宋体", 18F);
-            this.label_True_XY.Location = new System.Drawing.Point(19, 17);
+            this.label_True_XY.Location = new System.Drawing.Point(207, 12);
             this.label_True_XY.Name = "label_True_XY";
             this.label_True_XY.Size = new System.Drawing.Size(166, 24);
             this.label_True_XY.TabIndex = 5;
             this.label_True_XY.Text = "X:8888 Y:8888";
             this.label_True_XY.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // button_saveRoute
-            // 
-            this.button_saveRoute.Location = new System.Drawing.Point(23, 65);
-            this.button_saveRoute.Name = "button_saveRoute";
-            this.button_saveRoute.Size = new System.Drawing.Size(78, 43);
-            this.button_saveRoute.TabIndex = 2;
-            this.button_saveRoute.Text = "保存路径";
-            this.button_saveRoute.UseVisualStyleBackColor = true;
-            this.button_saveRoute.Click += new System.EventHandler(this.button_saveRoute_Click);
             // 
             // label1
             // 
@@ -225,9 +315,10 @@
             // 
             this.splitContainer3.Panel2.Controls.Add(this.label5_LED);
             this.splitContainer3.Panel2.Controls.Add(this.button1_openclose);
+            this.splitContainer3.Panel2.Controls.Add(this.label4);
+            this.splitContainer3.Panel2.Controls.Add(this.label_True_XY);
             this.splitContainer3.Panel2.Controls.Add(this.label3);
             this.splitContainer3.Panel2.Controls.Add(this.comboBox2_BaudRate);
-            this.splitContainer3.Panel2.Controls.Add(this.label4);
             this.splitContainer3.Panel2.Controls.Add(this.comboBox1_PortName);
             this.splitContainer3.Panel2.Controls.Add(this.label_Grid);
             this.splitContainer3.Panel2.Controls.Add(this.label_XY);
@@ -236,6 +327,81 @@
             this.splitContainer3.Size = new System.Drawing.Size(1471, 777);
             this.splitContainer3.SplitterDistance = 728;
             this.splitContainer3.TabIndex = 1;
+            // 
+            // label5_LED
+            // 
+            this.label5_LED.AutoSize = true;
+            this.label5_LED.BackColor = System.Drawing.SystemColors.Control;
+            this.label5_LED.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.label5_LED.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.label5_LED.Location = new System.Drawing.Point(728, 23);
+            this.label5_LED.Name = "label5_LED";
+            this.label5_LED.Size = new System.Drawing.Size(17, 12);
+            this.label5_LED.TabIndex = 16;
+            this.label5_LED.Text = "●";
+            // 
+            // button1_openclose
+            // 
+            this.button1_openclose.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.button1_openclose.Location = new System.Drawing.Point(761, 18);
+            this.button1_openclose.Name = "button1_openclose";
+            this.button1_openclose.Size = new System.Drawing.Size(96, 23);
+            this.button1_openclose.TabIndex = 11;
+            this.button1_openclose.Text = "打开串口";
+            this.button1_openclose.UseVisualStyleBackColor = true;
+            this.button1_openclose.Click += new System.EventHandler(this.button1_openclose_Click);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.label4.Location = new System.Drawing.Point(415, 22);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(47, 12);
+            this.label4.TabIndex = 14;
+            this.label4.Text = "串  口:";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.label3.Location = new System.Drawing.Point(575, 23);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(47, 12);
+            this.label3.TabIndex = 15;
+            this.label3.Text = "波特率:";
+            // 
+            // comboBox2_BaudRate
+            // 
+            this.comboBox2_BaudRate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.comboBox2_BaudRate.AutoCompleteCustomSource.AddRange(new string[] {
+            "9600",
+            "19200",
+            "115200"});
+            this.comboBox2_BaudRate.FormattingEnabled = true;
+            this.comboBox2_BaudRate.Items.AddRange(new object[] {
+            "9600",
+            "19200",
+            "115200",
+            "256000",
+            "921600"});
+            this.comboBox2_BaudRate.Location = new System.Drawing.Point(627, 19);
+            this.comboBox2_BaudRate.Name = "comboBox2_BaudRate";
+            this.comboBox2_BaudRate.Size = new System.Drawing.Size(97, 20);
+            this.comboBox2_BaudRate.TabIndex = 13;
+            this.comboBox2_BaudRate.SelectionChangeCommitted += new System.EventHandler(this.comboBox2_BaudRate_SelectionChangeCommitted);
+            // 
+            // comboBox1_PortName
+            // 
+            this.comboBox1_PortName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.comboBox1_PortName.FormattingEnabled = true;
+            this.comboBox1_PortName.Location = new System.Drawing.Point(467, 18);
+            this.comboBox1_PortName.Name = "comboBox1_PortName";
+            this.comboBox1_PortName.Size = new System.Drawing.Size(97, 20);
+            this.comboBox1_PortName.TabIndex = 12;
+            this.comboBox1_PortName.SelectionChangeCommitted += new System.EventHandler(this.comboBox1_PortName_SelectionChangeCommitted);
             // 
             // label_Grid
             // 
@@ -263,100 +429,37 @@
             this.serialPort1.PortName = "COM10";
             this.serialPort1.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort1_DataReceived);
             // 
-            // label5_LED
+            // dataGridView_Draw
             // 
-            this.label5_LED.AutoSize = true;
-            this.label5_LED.BackColor = System.Drawing.SystemColors.Control;
-            this.label5_LED.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label5_LED.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label5_LED.Location = new System.Drawing.Point(589, 18);
-            this.label5_LED.Name = "label5_LED";
-            this.label5_LED.Size = new System.Drawing.Size(17, 12);
-            this.label5_LED.TabIndex = 16;
-            this.label5_LED.Text = "●";
+            this.dataGridView_Draw.AllowUserToAddRows = false;
+            this.dataGridView_Draw.AllowUserToDeleteRows = false;
+            this.dataGridView_Draw.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView_Draw.Location = new System.Drawing.Point(3, 155);
+            this.dataGridView_Draw.Name = "dataGridView_Draw";
+            this.dataGridView_Draw.ReadOnly = true;
+            this.dataGridView_Draw.RowTemplate.Height = 23;
+            this.dataGridView_Draw.Size = new System.Drawing.Size(283, 95);
+            this.dataGridView_Draw.TabIndex = 14;
             // 
-            // button1_openclose
+            // form1BindingSource
             // 
-            this.button1_openclose.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.button1_openclose.Location = new System.Drawing.Point(622, 13);
-            this.button1_openclose.Name = "button1_openclose";
-            this.button1_openclose.Size = new System.Drawing.Size(96, 23);
-            this.button1_openclose.TabIndex = 11;
-            this.button1_openclose.Text = "打开串口";
-            this.button1_openclose.UseVisualStyleBackColor = true;
-            this.button1_openclose.Click += new System.EventHandler(this.button1_openclose_Click);
+            this.form1BindingSource.DataSource = typeof(guandao.Form1);
             // 
-            // label3
+            // form1BindingSource1
             // 
-            this.label3.AutoSize = true;
-            this.label3.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label3.Location = new System.Drawing.Point(413, 18);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(47, 12);
-            this.label3.TabIndex = 15;
-            this.label3.Text = "波特率:";
+            this.form1BindingSource1.DataSource = typeof(guandao.Form1);
             // 
-            // comboBox2_BaudRate
+            // dataGridView_DrawDelete
             // 
-            this.comboBox2_BaudRate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.comboBox2_BaudRate.AutoCompleteCustomSource.AddRange(new string[] {
-            "9600",
-            "19200",
-            "115200"});
-            this.comboBox2_BaudRate.FormattingEnabled = true;
-            this.comboBox2_BaudRate.Items.AddRange(new object[] {
-            "9600",
-            "19200",
-            "115200",
-            "256000",
-            "921600"});
-            this.comboBox2_BaudRate.Location = new System.Drawing.Point(465, 14);
-            this.comboBox2_BaudRate.Name = "comboBox2_BaudRate";
-            this.comboBox2_BaudRate.Size = new System.Drawing.Size(97, 20);
-            this.comboBox2_BaudRate.TabIndex = 13;
-            this.comboBox2_BaudRate.SelectionChangeCommitted += new System.EventHandler(this.comboBox2_BaudRate_SelectionChangeCommitted);
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label4.Location = new System.Drawing.Point(244, 18);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(47, 12);
-            this.label4.TabIndex = 14;
-            this.label4.Text = "串  口:";
-            // 
-            // comboBox1_PortName
-            // 
-            this.comboBox1_PortName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.comboBox1_PortName.FormattingEnabled = true;
-            this.comboBox1_PortName.Location = new System.Drawing.Point(296, 14);
-            this.comboBox1_PortName.Name = "comboBox1_PortName";
-            this.comboBox1_PortName.Size = new System.Drawing.Size(97, 20);
-            this.comboBox1_PortName.TabIndex = 12;
-            this.comboBox1_PortName.SelectionChangeCommitted += new System.EventHandler(this.comboBox1_PortName_SelectionChangeCommitted);
-            // 
-            // button_loadmap
-            // 
-            this.button_loadmap.Location = new System.Drawing.Point(107, 65);
-            this.button_loadmap.Name = "button_loadmap";
-            this.button_loadmap.Size = new System.Drawing.Size(80, 43);
-            this.button_loadmap.TabIndex = 7;
-            this.button_loadmap.Text = "加载路径";
-            this.button_loadmap.UseVisualStyleBackColor = true;
-            this.button_loadmap.Click += new System.EventHandler(this.button_loadmap_Click);
-            // 
-            // button_Clear
-            // 
-            this.button_Clear.Location = new System.Drawing.Point(195, 65);
-            this.button_Clear.Name = "button_Clear";
-            this.button_Clear.Size = new System.Drawing.Size(78, 43);
-            this.button_Clear.TabIndex = 8;
-            this.button_Clear.Text = "清除地图";
-            this.button_Clear.UseVisualStyleBackColor = true;
-            this.button_Clear.Click += new System.EventHandler(this.button_Clear_Click);
+            this.dataGridView_DrawDelete.AllowUserToAddRows = false;
+            this.dataGridView_DrawDelete.AllowUserToDeleteRows = false;
+            this.dataGridView_DrawDelete.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView_DrawDelete.Location = new System.Drawing.Point(0, 256);
+            this.dataGridView_DrawDelete.Name = "dataGridView_DrawDelete";
+            this.dataGridView_DrawDelete.ReadOnly = true;
+            this.dataGridView_DrawDelete.RowTemplate.Height = 23;
+            this.dataGridView_DrawDelete.Size = new System.Drawing.Size(283, 95);
+            this.dataGridView_DrawDelete.TabIndex = 15;
             // 
             // Form1
             // 
@@ -388,6 +491,10 @@
             this.splitContainer3.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
             this.splitContainer3.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Draw)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.form1BindingSource)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.form1BindingSource1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_DrawDelete)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -417,6 +524,15 @@
         private System.Windows.Forms.ComboBox comboBox1_PortName;
         private System.Windows.Forms.Button button_loadmap;
         private System.Windows.Forms.Button button_Clear;
+        private System.Windows.Forms.Button button_add_point;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox textBox_AddY;
+        private System.Windows.Forms.TextBox textBox_AddX;
+        private System.Windows.Forms.DataGridView dataGridView_Draw;
+        private System.Windows.Forms.BindingSource form1BindingSource;
+        private System.Windows.Forms.BindingSource form1BindingSource1;
+        private System.Windows.Forms.DataGridView dataGridView_DrawDelete;
     }
 }
 
