@@ -34,13 +34,13 @@
             this.pictureBoxForce = new System.Windows.Forms.PictureBox();
             this.pictureBoxBackGround = new System.Windows.Forms.PictureBox();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.dataGridView_DrawDelete = new System.Windows.Forms.DataGridView();
+            this.dataGridView_Draw = new System.Windows.Forms.DataGridView();
             this.button_add_point = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
             this.button_Clear = new System.Windows.Forms.Button();
             this.button_loadmap = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
-            this.textBox_port = new System.Windows.Forms.TextBox();
             this.textBox_AddY = new System.Windows.Forms.TextBox();
             this.button_saveRoute = new System.Windows.Forms.Button();
             this.textBox_AddX = new System.Windows.Forms.TextBox();
@@ -57,10 +57,12 @@
             this.label_Grid = new System.Windows.Forms.Label();
             this.label_XY = new System.Windows.Forms.Label();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
-            this.dataGridView_Draw = new System.Windows.Forms.DataGridView();
             this.form1BindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.form1BindingSource1 = new System.Windows.Forms.BindingSource(this.components);
-            this.dataGridView_DrawDelete = new System.Windows.Forms.DataGridView();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.dataGridView_RealTimeXY = new System.Windows.Forms.DataGridView();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -72,14 +74,15 @@
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_DrawDelete)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Draw)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).BeginInit();
             this.splitContainer3.Panel1.SuspendLayout();
             this.splitContainer3.Panel2.SuspendLayout();
             this.splitContainer3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Draw)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.form1BindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.form1BindingSource1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_DrawDelete)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_RealTimeXY)).BeginInit();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -145,18 +148,20 @@
             // 
             // splitContainer2.Panel1
             // 
-            this.splitContainer2.Panel1.Controls.Add(this.textBox1);
+            this.splitContainer2.Panel1.Controls.Add(this.label7);
+            this.splitContainer2.Panel1.Controls.Add(this.dataGridView_Draw);
             // 
             // splitContainer2.Panel2
             // 
+            this.splitContainer2.Panel2.Controls.Add(this.label9);
+            this.splitContainer2.Panel2.Controls.Add(this.dataGridView_RealTimeXY);
+            this.splitContainer2.Panel2.Controls.Add(this.label8);
             this.splitContainer2.Panel2.Controls.Add(this.dataGridView_DrawDelete);
-            this.splitContainer2.Panel2.Controls.Add(this.dataGridView_Draw);
             this.splitContainer2.Panel2.Controls.Add(this.button_add_point);
             this.splitContainer2.Panel2.Controls.Add(this.label6);
             this.splitContainer2.Panel2.Controls.Add(this.button_Clear);
             this.splitContainer2.Panel2.Controls.Add(this.button_loadmap);
             this.splitContainer2.Panel2.Controls.Add(this.label5);
-            this.splitContainer2.Panel2.Controls.Add(this.textBox_port);
             this.splitContainer2.Panel2.Controls.Add(this.textBox_AddY);
             this.splitContainer2.Panel2.Controls.Add(this.button_saveRoute);
             this.splitContainer2.Panel2.Controls.Add(this.textBox_AddX);
@@ -164,21 +169,33 @@
             this.splitContainer2.SplitterDistance = 235;
             this.splitContainer2.TabIndex = 1;
             // 
-            // textBox1
+            // dataGridView_DrawDelete
             // 
-            this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBox1.Font = new System.Drawing.Font("宋体", 25F);
-            this.textBox1.Location = new System.Drawing.Point(0, 0);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox1.Size = new System.Drawing.Size(298, 235);
-            this.textBox1.TabIndex = 1;
-            this.textBox1.WordWrap = false;
+            this.dataGridView_DrawDelete.AllowUserToAddRows = false;
+            this.dataGridView_DrawDelete.AllowUserToDeleteRows = false;
+            this.dataGridView_DrawDelete.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView_DrawDelete.Location = new System.Drawing.Point(0, 27);
+            this.dataGridView_DrawDelete.Name = "dataGridView_DrawDelete";
+            this.dataGridView_DrawDelete.ReadOnly = true;
+            this.dataGridView_DrawDelete.RowTemplate.Height = 23;
+            this.dataGridView_DrawDelete.Size = new System.Drawing.Size(295, 95);
+            this.dataGridView_DrawDelete.TabIndex = 15;
+            // 
+            // dataGridView_Draw
+            // 
+            this.dataGridView_Draw.AllowUserToAddRows = false;
+            this.dataGridView_Draw.AllowUserToDeleteRows = false;
+            this.dataGridView_Draw.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView_Draw.Location = new System.Drawing.Point(3, 32);
+            this.dataGridView_Draw.Name = "dataGridView_Draw";
+            this.dataGridView_Draw.ReadOnly = true;
+            this.dataGridView_Draw.RowTemplate.Height = 23;
+            this.dataGridView_Draw.Size = new System.Drawing.Size(292, 200);
+            this.dataGridView_Draw.TabIndex = 14;
             // 
             // button_add_point
             // 
-            this.button_add_point.Location = new System.Drawing.Point(219, 114);
+            this.button_add_point.Location = new System.Drawing.Point(216, 310);
             this.button_add_point.Name = "button_add_point";
             this.button_add_point.Size = new System.Drawing.Size(67, 35);
             this.button_add_point.TabIndex = 13;
@@ -190,7 +207,7 @@
             // 
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("宋体", 18F);
-            this.label6.Location = new System.Drawing.Point(116, 117);
+            this.label6.Location = new System.Drawing.Point(113, 313);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(34, 24);
             this.label6.TabIndex = 12;
@@ -223,29 +240,17 @@
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("宋体", 18F);
-            this.label5.Location = new System.Drawing.Point(22, 117);
+            this.label5.Location = new System.Drawing.Point(19, 313);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(34, 24);
             this.label5.TabIndex = 11;
             this.label5.Text = "X:";
             this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // textBox_port
-            // 
-            this.textBox_port.Dock = System.Windows.Forms.DockStyle.Top;
-            this.textBox_port.Font = new System.Drawing.Font("宋体", 25F);
-            this.textBox_port.Location = new System.Drawing.Point(0, 0);
-            this.textBox_port.Multiline = true;
-            this.textBox_port.Name = "textBox_port";
-            this.textBox_port.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox_port.Size = new System.Drawing.Size(298, 108);
-            this.textBox_port.TabIndex = 6;
-            this.textBox_port.WordWrap = false;
-            // 
             // textBox_AddY
             // 
             this.textBox_AddY.Font = new System.Drawing.Font("宋体", 18F);
-            this.textBox_AddY.Location = new System.Drawing.Point(156, 114);
+            this.textBox_AddY.Location = new System.Drawing.Point(153, 310);
             this.textBox_AddY.Name = "textBox_AddY";
             this.textBox_AddY.Size = new System.Drawing.Size(55, 35);
             this.textBox_AddY.TabIndex = 10;
@@ -264,7 +269,7 @@
             // textBox_AddX
             // 
             this.textBox_AddX.Font = new System.Drawing.Font("宋体", 18F);
-            this.textBox_AddX.Location = new System.Drawing.Point(59, 114);
+            this.textBox_AddX.Location = new System.Drawing.Point(56, 310);
             this.textBox_AddX.Name = "textBox_AddX";
             this.textBox_AddX.Size = new System.Drawing.Size(55, 35);
             this.textBox_AddX.TabIndex = 9;
@@ -429,18 +434,6 @@
             this.serialPort1.PortName = "COM10";
             this.serialPort1.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort1_DataReceived);
             // 
-            // dataGridView_Draw
-            // 
-            this.dataGridView_Draw.AllowUserToAddRows = false;
-            this.dataGridView_Draw.AllowUserToDeleteRows = false;
-            this.dataGridView_Draw.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView_Draw.Location = new System.Drawing.Point(3, 155);
-            this.dataGridView_Draw.Name = "dataGridView_Draw";
-            this.dataGridView_Draw.ReadOnly = true;
-            this.dataGridView_Draw.RowTemplate.Height = 23;
-            this.dataGridView_Draw.Size = new System.Drawing.Size(283, 95);
-            this.dataGridView_Draw.TabIndex = 14;
-            // 
             // form1BindingSource
             // 
             this.form1BindingSource.DataSource = typeof(guandao.Form1);
@@ -449,17 +442,50 @@
             // 
             this.form1BindingSource1.DataSource = typeof(guandao.Form1);
             // 
-            // dataGridView_DrawDelete
+            // label7
             // 
-            this.dataGridView_DrawDelete.AllowUserToAddRows = false;
-            this.dataGridView_DrawDelete.AllowUserToDeleteRows = false;
-            this.dataGridView_DrawDelete.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView_DrawDelete.Location = new System.Drawing.Point(0, 256);
-            this.dataGridView_DrawDelete.Name = "dataGridView_DrawDelete";
-            this.dataGridView_DrawDelete.ReadOnly = true;
-            this.dataGridView_DrawDelete.RowTemplate.Height = 23;
-            this.dataGridView_DrawDelete.Size = new System.Drawing.Size(283, 95);
-            this.dataGridView_DrawDelete.TabIndex = 15;
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("宋体", 18F);
+            this.label7.Location = new System.Drawing.Point(3, 5);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(106, 24);
+            this.label7.TabIndex = 15;
+            this.label7.Text = "绘制坐标";
+            this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Font = new System.Drawing.Font("宋体", 18F);
+            this.label8.Location = new System.Drawing.Point(2, 0);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(130, 24);
+            this.label8.TabIndex = 16;
+            this.label8.Text = "删除的坐标";
+            this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Font = new System.Drawing.Font("宋体", 18F);
+            this.label9.Location = new System.Drawing.Point(2, 130);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(106, 24);
+            this.label9.TabIndex = 18;
+            this.label9.Text = "实时坐标";
+            this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // dataGridView_RealTimeXY
+            // 
+            this.dataGridView_RealTimeXY.AllowUserToAddRows = false;
+            this.dataGridView_RealTimeXY.AllowUserToDeleteRows = false;
+            this.dataGridView_RealTimeXY.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView_RealTimeXY.Location = new System.Drawing.Point(0, 157);
+            this.dataGridView_RealTimeXY.Name = "dataGridView_RealTimeXY";
+            this.dataGridView_RealTimeXY.ReadOnly = true;
+            this.dataGridView_RealTimeXY.RowTemplate.Height = 23;
+            this.dataGridView_RealTimeXY.Size = new System.Drawing.Size(295, 95);
+            this.dataGridView_RealTimeXY.TabIndex = 17;
             // 
             // Form1
             // 
@@ -486,15 +512,16 @@
             this.splitContainer2.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_DrawDelete)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Draw)).EndInit();
             this.splitContainer3.Panel1.ResumeLayout(false);
             this.splitContainer3.Panel2.ResumeLayout(false);
             this.splitContainer3.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
             this.splitContainer3.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Draw)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.form1BindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.form1BindingSource1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_DrawDelete)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_RealTimeXY)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -504,7 +531,6 @@
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.PictureBox pictureBoxBackGround;
         private System.Windows.Forms.SplitContainer splitContainer2;
-        private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button button_saveRoute;
@@ -514,7 +540,6 @@
         private System.Windows.Forms.Label label_True_XY;
         private System.Windows.Forms.PictureBox pictureBox_location;
         private System.IO.Ports.SerialPort serialPort1;
-        private System.Windows.Forms.TextBox textBox_port;
         private System.Windows.Forms.PictureBox pictureBoxForce;
         private System.Windows.Forms.Label label5_LED;
         private System.Windows.Forms.Button button1_openclose;
@@ -533,6 +558,10 @@
         private System.Windows.Forms.BindingSource form1BindingSource;
         private System.Windows.Forms.BindingSource form1BindingSource1;
         private System.Windows.Forms.DataGridView dataGridView_DrawDelete;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.DataGridView dataGridView_RealTimeXY;
+        private System.Windows.Forms.Label label8;
     }
 }
 
