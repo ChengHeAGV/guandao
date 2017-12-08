@@ -63,6 +63,7 @@
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.form1BindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.form1BindingSource1 = new System.Windows.Forms.BindingSource(this.components);
+            this.textBox_RealTimeXY = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -153,6 +154,7 @@
             // 
             // splitContainer2.Panel2
             // 
+            this.splitContainer2.Panel2.Controls.Add(this.textBox_RealTimeXY);
             this.splitContainer2.Panel2.Controls.Add(this.label9);
             this.splitContainer2.Panel2.Controls.Add(this.dataGridView_RealTimeXY);
             this.splitContainer2.Panel2.Controls.Add(this.label8);
@@ -215,7 +217,7 @@
             this.dataGridView_RealTimeXY.ReadOnly = true;
             this.dataGridView_RealTimeXY.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
             this.dataGridView_RealTimeXY.RowTemplate.Height = 23;
-            this.dataGridView_RealTimeXY.Size = new System.Drawing.Size(295, 95);
+            this.dataGridView_RealTimeXY.Size = new System.Drawing.Size(295, 30);
             this.dataGridView_RealTimeXY.TabIndex = 17;
             this.dataGridView_RealTimeXY.RowStateChanged += new System.Windows.Forms.DataGridViewRowStateChangedEventHandler(this.dataGridView_RealTimeXY_RowStateChanged);
             // 
@@ -483,6 +485,7 @@
             // serialPort1
             // 
             this.serialPort1.PortName = "COM10";
+            this.serialPort1.ReceivedBytesThreshold = 6;
             this.serialPort1.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort1_DataReceived);
             // 
             // form1BindingSource
@@ -493,6 +496,15 @@
             // 
             this.form1BindingSource1.DataSource = typeof(guandao.Form1);
             // 
+            // textBox_RealTimeXY
+            // 
+            this.textBox_RealTimeXY.Font = new System.Drawing.Font("宋体", 16F);
+            this.textBox_RealTimeXY.Location = new System.Drawing.Point(0, 157);
+            this.textBox_RealTimeXY.Multiline = true;
+            this.textBox_RealTimeXY.Name = "textBox_RealTimeXY";
+            this.textBox_RealTimeXY.Size = new System.Drawing.Size(298, 96);
+            this.textBox_RealTimeXY.TabIndex = 19;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -502,7 +514,7 @@
             this.KeyPreview = true;
             this.Name = "Form1";
             this.Text = "Form1";
-            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.splitContainer1.Panel1.ResumeLayout(false);
@@ -568,6 +580,7 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.DataGridView dataGridView_RealTimeXY;
         private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.TextBox textBox_RealTimeXY;
     }
 }
 

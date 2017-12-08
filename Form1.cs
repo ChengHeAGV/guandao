@@ -14,6 +14,9 @@ namespace guandao
 {
     public partial class Form1 : Form
     {
+        //实时绘图线程
+        Thread RealTimeThread;
+
         public Form1()
         {
             InitializeComponent();
@@ -33,6 +36,8 @@ namespace guandao
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            //string df = "287j89WTx81y2881y282j88WTx83y234j88WTx83y235j88WTx83y224j88W";
+            //df = GetValue(df,"T","W");
             //图层初始化
             Draw_Init();
 
@@ -77,6 +82,10 @@ namespace guandao
                 }
             }
             #endregion
+
+            //实时绘图线程
+            RealTimeThread = new Thread(Draw_RealTimePoint);
+            RealTimeThread.Start();
         }
 
         Size MapSize;
@@ -92,6 +101,9 @@ namespace guandao
         //光标当前位置
         Point NowPoint;
 
+        //中心点坐标
+        Point CenterPoint;
+
         //绘图模式
         bool MapMode = false;
 
@@ -101,7 +113,11 @@ namespace guandao
         //图层初始化
         void Draw_Init()
         {
+            //获取绘图区域Size
+            MapSize = pictureBoxBackGround.Size;
 
+            //初始化中心点坐标,地图中心
+            CenterPoint = new Point(50, 50);
 
             //初始化坐标集合，添加原点坐标
             DrawPointList.Add(new Point(0, 0));
@@ -118,11 +134,7 @@ namespace guandao
             pictureBox_location.BackColor = Color.Transparent;
             pictureBox_location.Parent = pictureBoxForce;
             #endregion
-            RealTimePointList.Add(new Point3D(10, 10, 145));
-
-            //绘制定位圆圈
-            Draw_location(true);
-
+            RealTimePointList.Add(new Point3D(0, 0, 0));
         }
 
         //绘制网格
@@ -144,17 +156,6 @@ namespace guandao
                 //画虚线
                 pen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dot;
 
-                //在图片上网格线
-                ////横线
-                //for (int i = 0; i < MapSize.Height / Grid + 1; i++)
-                //{
-                //    g.DrawLine(pen, 0, MapSize.Height - Grid * i, MapSize.Width, MapSize.Height - Grid * i);
-                //}
-                ////竖线
-                //for (int i = 0; i < MapSize.Width / Grid + 1; i++)
-                //{
-                //    g.DrawLine(pen, Grid * i, 0, Grid * i, MapSize.Height);
-                //}
                 #region 绘制网格
                 //横线
                 for (int i = 0; i < (MapSize.Height) / Grid + 1; i++)
@@ -168,75 +169,121 @@ namespace guandao
                 }
                 #endregion
 
-                g.Dispose();
+                #region 绘制中心XY轴坐标箭头
+                pen = new Pen(Color.Yellow);
+                int lineLength = 50;
+                //int Drawed_X = (int)(RealTimePointList[i].X * Grid + CenterPoint.X);
+                //int Drawed_Y = (int)(MapSize.Height - RealTimePointList[i].Y * Grid - CenterPoint.Y);
+
+                //X轴
+                g.DrawLine(pen, CenterPoint.X - lineLength, MapSize.Height - CenterPoint.Y, CenterPoint.X + lineLength, MapSize.Height - CenterPoint.Y);
+                //箭头上部分
+                g.DrawLine(pen, CenterPoint.X + (int)(lineLength / 1.5), MapSize.Height - CenterPoint.Y - lineLength / 6, CenterPoint.X + lineLength, MapSize.Height - CenterPoint.Y);
+                //箭头下部分
+                g.DrawLine(pen, CenterPoint.X + (int)(lineLength / 1.5), MapSize.Height - CenterPoint.Y + lineLength / 6, CenterPoint.X + lineLength, MapSize.Height - CenterPoint.Y);
+
+                //Y轴
+                g.DrawLine(pen, CenterPoint.X, MapSize.Height - CenterPoint.Y - lineLength, CenterPoint.X, MapSize.Height - CenterPoint.Y + lineLength);
+                //箭头左部分
+                g.DrawLine(pen, CenterPoint.X - lineLength / 6, MapSize.Height - CenterPoint.Y - (int)(lineLength / 1.5), CenterPoint.X, MapSize.Height - CenterPoint.Y - lineLength);
+                //箭头右部分
+                g.DrawLine(pen, CenterPoint.X + lineLength / 6, MapSize.Height - CenterPoint.Y - (int)(lineLength / 1.5), CenterPoint.X, MapSize.Height - CenterPoint.Y - lineLength);
+                #endregion
+
+                // g.Dispose();
             }
             pictureBoxBackGround.Image = bmp;
             pictureBoxBackGround.BackColor = Color.Black;
             #endregion
         }
 
-        //绘制实时位置
-        void Draw_location(bool dis)
+        //绘制实时位置,独立进程
+        int RealTimePointLength = 0;
+        private void Draw_RealTimePoint()
         {
-            //当前位置指示器直径
-            int Radius = 20;
-
-            Bitmap bmp = new Bitmap(MapSize.Width, MapSize.Height);
-            Graphics g = Graphics.FromImage(bmp);
-            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
-            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            Brush bush = new SolidBrush(Color.OrangeRed);//填充的颜色
-
-            //画已经绘制的线段
-            if (RealTimePointList.Count >= 2)
+            //当实时坐标变化时重新绘制
+            while (true)
             {
-                for (int i = 0; i < RealTimePointList.Count - 1; i++)
+                Thread.Sleep(100);
+                if (RealTimePointLength != RealTimePointList.Count)
                 {
+                    RealTimePointLength = RealTimePointList.Count;
+                    //this.Invoke(new MethodInvoker(delegate
+                    //{
+
+                    //}));
+
+                    //当前位置指示器直径
+                    int Radius = 20;
+
+                    Bitmap bmp = new Bitmap(MapSize.Width, MapSize.Height);
+                    Graphics g = Graphics.FromImage(bmp);
+                    g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+                    g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+                    g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                    Brush bush = new SolidBrush(Color.OrangeRed);//填充的颜色
+
+                    //MapSize.Width / Grid / 2 * Grid, MapSize.Height - MapSize.Height / Grid / 2 * Grid
+
                     //画已经绘制的线段
-                    g.DrawLine(new Pen(Color.White, 3), RealTimePointList[i].X * Grid, MapSize.Height - RealTimePointList[i].Y * Grid, RealTimePointList[i + 1].X * Grid, MapSize.Height - RealTimePointList[i + 1].Y * Grid);
+                    if (RealTimePointList.Count >= 2)
+                    {
+                        for (int i = 0; i < RealTimePointList.Count - 1; i++)
+                        {
+
+                            int Drawed_X = (int)(RealTimePointList[i].X * Grid + CenterPoint.X);
+                            int Drawed_Y = (int)(MapSize.Height - RealTimePointList[i].Y * Grid - CenterPoint.Y);
+
+                            int Drawed_X1 = (int)(RealTimePointList[i + 1].X * Grid + CenterPoint.X);
+                            int Drawed_Y1 = (int)(MapSize.Height - RealTimePointList[i + 1].Y * Grid - CenterPoint.Y);
+
+                            //画已经绘制的线段
+                            //g.DrawLine(new Pen(Color.White, 3), RealTimePointList[i].X * Grid, MapSize.Height - RealTimePointList[i].Y * Grid, RealTimePointList[i + 1].X * Grid, MapSize.Height - RealTimePointList[i + 1].Y * Grid);
+                            g.DrawLine(new Pen(Color.White, 3), Drawed_X, Drawed_Y, Drawed_X1, Drawed_Y1);
+                        }
+                    }
+
+                    //绘制当前位置指示器
+                    if (RealTimePointList.Count > 0)
+                    {
+                        //画三角形
+                        float d = 45;
+                        float angle = RealTimePointList[RealTimePointList.Count - 1].Z;
+                        Point center = new Point();
+                        Point[] point = new Point[3];
+                        center.X = (int)(RealTimePointList[RealTimePointList.Count - 1].X * Grid + CenterPoint.X);
+                        center.Y = (int)(MapSize.Height - RealTimePointList[RealTimePointList.Count - 1].Y * Grid - CenterPoint.Y); ;
+
+                        point[0].X = (int)(center.X + (float)(Math.Cos(Math.PI * (angle / 180.0)) * d));
+                        point[0].Y = (int)(center.Y - (float)(Math.Sin(Math.PI * (angle / 180.0)) * d));
+
+                        double Q1 = angle;
+                        double Q2 = Math.Acos(Radius / d) * 180 / Math.PI;
+                        double Q3 = Q1 + Q2;
+
+                        point[1].X = (int)(center.X + Radius * Math.Cos(Math.PI * (Q3 / 180.0)));
+                        point[1].Y = (int)(center.Y - Radius * Math.Sin(Math.PI * (Q3 / 180.0)));
+
+                        double q1 = angle;
+                        double q2 = Math.Acos(Radius / d) * 180 / Math.PI;
+                        double q3 = 360 - (q2 - q1);
+                        point[2].X = (int)(center.X + Radius * Math.Cos(Math.PI * (q3 / 180.0)));
+                        point[2].Y = (int)(center.Y - Radius * Math.Sin(Math.PI * (q3 / 180.0)));
+
+                        g.FillPolygon(bush, point);
+
+                        //画角度线
+                        //g.DrawLine(new Pen(Color.Red, 1), center.X, center.Y, point[0].X, point[0].Y);
+
+                        //画圆
+                        bush = new SolidBrush(Color.Orange);//填充的颜色
+                        g.FillEllipse(bush, center.X - Radius, center.Y - Radius, Radius * 2, Radius * 2);
+                    }
+
+                    //g.Dispose();
+                    pictureBox_location.Image = bmp;
                 }
             }
-
-            //绘制当前位置指示器
-            if (dis && RealTimePointList.Count > 0)
-            {
-                //画三角形
-                float d = 45;
-                float angle = RealTimePointList[RealTimePointList.Count - 1].Z;
-                Point center = new Point();
-                Point[] point = new Point[3];
-                center.X = (int)(RealTimePointList[RealTimePointList.Count - 1].X) * Grid;
-                center.Y = (int)(MapSize.Height - (RealTimePointList[RealTimePointList.Count - 1].Y) * Grid);
-
-                point[0].X = (int)(center.X + (float)(Math.Cos(Math.PI * (angle / 180.0)) * d));
-                point[0].Y = (int)(center.Y - (float)(Math.Sin(Math.PI * (angle / 180.0)) * d));
-
-                double Q1 = angle;
-                double Q2 = Math.Acos(Radius / d) * 180 / Math.PI;
-                double Q3 = Q1 + Q2;
-
-                point[1].X = (int)(center.X + Radius * Math.Cos(Math.PI * (Q3 / 180.0)));
-                point[1].Y = (int)(center.Y - Radius * Math.Sin(Math.PI * (Q3 / 180.0)));
-
-                double q1 = angle;
-                double q2 = Math.Acos(Radius / d) * 180 / Math.PI;
-                double q3 = 360 - (q2 - q1);
-                point[2].X = (int)(center.X + Radius * Math.Cos(Math.PI * (q3 / 180.0)));
-                point[2].Y = (int)(center.Y - Radius * Math.Sin(Math.PI * (q3 / 180.0)));
-
-                g.FillPolygon(bush, point);
-
-                //画角度线
-                //g.DrawLine(new Pen(Color.Red, 1), center.X, center.Y, point[0].X, point[0].Y);
-
-                //画圆
-                bush = new SolidBrush(Color.Orange);//填充的颜色
-                g.FillEllipse(bush, center.X - Radius, center.Y - Radius, Radius * 2, Radius * 2);
-            }
-
-            g.Dispose();
-            pictureBox_location.Image = bmp;
         }
 
         //改变Grid
@@ -266,7 +313,7 @@ namespace guandao
                     ReloadUI();
 
                     label1.Text = DrawPointList.Count.ToString();
-                    label2.Text = DrawPointListDelete.ToString();
+                    label2.Text = DrawPointListDelete.Count.ToString();
                 }
             }
             else
@@ -303,11 +350,12 @@ namespace guandao
         }
 
         //重新加载界面
+        int DrawPointLength = 1;
         void ReloadUI()
         {
             //当前光标位置
-            int x = NowPoint.X * Grid;
-            int y = MapSize.Height - NowPoint.Y * Grid;
+            int x = NowPoint.X * Grid + CenterPoint.X;
+            int y = MapSize.Height - NowPoint.Y * Grid - CenterPoint.Y;
 
             //临时公用坐标变量
             //Point point = new Point(); 
@@ -334,26 +382,34 @@ namespace guandao
                 {
                     for (int i = 0; i < DrawPointList.Count - 1; i++)
                     {
+                        int Drawed_X = (int)(DrawPointList[i].X * Grid + CenterPoint.X);
+                        int Drawed_Y = (int)(MapSize.Height - DrawPointList[i].Y * Grid - CenterPoint.Y);
+                        int Drawed_X1 = (int)(DrawPointList[i + 1].X * Grid + CenterPoint.X);
+                        int Drawed_Y1 = (int)(MapSize.Height - DrawPointList[i + 1].Y * Grid - CenterPoint.Y);
 
                         //画已经绘制的线段
-                        g.DrawLine(new Pen(Color.White, 2), DrawPointList[i].X * Grid, MapSize.Height - DrawPointList[i].Y * Grid, DrawPointList[i + 1].X * Grid, MapSize.Height - DrawPointList[i + 1].Y * Grid);
+                        g.DrawLine(new Pen(Color.White, 2), Drawed_X, Drawed_Y, Drawed_X1, Drawed_Y1);
                         //画小叉号
-                        g.DrawLine(new Pen(Color.Gray, 1), DrawPointList[i].X * Grid - snap / 4, MapSize.Height - DrawPointList[i].Y * Grid - snap / 4, DrawPointList[i].X * Grid + snap / 4, MapSize.Height - DrawPointList[i].Y * Grid + snap / 4);
-                        g.DrawLine(new Pen(Color.Gray, 1), DrawPointList[i].X * Grid + snap / 4, MapSize.Height - DrawPointList[i].Y * Grid - snap / 4, DrawPointList[i].X * Grid - snap / 4, MapSize.Height - DrawPointList[i].Y * Grid + snap / 4);
+                        g.DrawLine(new Pen(Color.Gray, 1), Drawed_X - snap / 4, Drawed_Y - snap / 4, Drawed_X + snap / 4, Drawed_Y + snap / 4);
+                        g.DrawLine(new Pen(Color.Gray, 1), Drawed_X + snap / 4, Drawed_Y - snap / 4, Drawed_X - snap / 4, Drawed_Y + snap / 4);
                     }
                 }
 
                 //画正在绘制的线段
                 if (DrawPointList.Count >= 1)
                 {
-                    g.DrawLine(new Pen(Color.White, 2), DrawPointList[DrawPointList.Count - 1].X * Grid, MapSize.Height - DrawPointList[DrawPointList.Count - 1].Y * Grid, x, y);
+                    int Drawed_X = (int)(DrawPointList[DrawPointList.Count - 1].X * Grid + CenterPoint.X);
+                    int Drawed_Y = (int)(MapSize.Height - DrawPointList[DrawPointList.Count - 1].Y * Grid - CenterPoint.Y);
+                    g.DrawLine(new Pen(Color.White, 2), Drawed_X, Drawed_Y, x, y);
                 }
 
                 g.Dispose();
+                GC.Collect();
                 pictureBoxForce.Image = bmp;
             }
-            else
+            else if (DrawPointLength != DrawPointList.Count || mouseWheel)
             {
+                DrawPointLength = DrawPointList.Count;
                 Bitmap bmp = new Bitmap(MapSize.Width, MapSize.Height);
                 Graphics g = Graphics.FromImage(bmp);
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
@@ -366,11 +422,10 @@ namespace guandao
                 {
                     for (int i = 0; i < DrawPointList.Count - 1; i++)
                     {
-                        int Drawed_X = (DrawPointList[i].X+MapSize.Width/Grid/2) * Grid;
-                        int Drawed_Y = MapSize.Height - (DrawPointList[i].Y + MapSize.Height / Grid / 2) * Grid;
-
-                        int Drawed_X1 = (DrawPointList[i+1].X + MapSize.Width / Grid / 2) * Grid;
-                        int Drawed_Y1 = MapSize.Height - (DrawPointList[i+1].Y + MapSize.Height / Grid / 2) * Grid;
+                        int Drawed_X = (int)(DrawPointList[i].X * Grid + CenterPoint.X);
+                        int Drawed_Y = (int)(MapSize.Height - DrawPointList[i].Y * Grid - CenterPoint.Y);
+                        int Drawed_X1 = (int)(DrawPointList[i + 1].X * Grid + CenterPoint.X);
+                        int Drawed_Y1 = (int)(MapSize.Height - DrawPointList[i + 1].Y * Grid - CenterPoint.Y);
 
                         if (mouseWheel)
                         {
@@ -392,15 +447,18 @@ namespace guandao
                 {
                     //在拐点处画圆
                     int i = DrawPointList.Count - 1;
+                    int Drawed_X = (int)(DrawPointList[i].X * Grid + CenterPoint.X);
+                    int Drawed_Y = (int)(MapSize.Height - DrawPointList[i].Y * Grid - CenterPoint.Y);
                     if (mouseWheel)
-                        g.FillEllipse(bush, ((DrawPointList[i].X + MapSize.Width / Grid / 2) * Grid) - r, (MapSize.Height - (DrawPointList[i].Y + MapSize.Height / Grid / 2) * Grid - r), 2 * r, 2 * r);
+                        g.FillEllipse(bush, Drawed_X - r, Drawed_Y - r, 2 * r, 2 * r);
                     else
-                        g.FillEllipse(bush, (DrawPointList[i].X + MapSize.Width / Grid / 2) * Grid - r, MapSize.Height - (DrawPointList[i].Y + MapSize.Height / Grid / 2) * Grid - r, 2 * r, 2 * r);
+                        g.FillEllipse(bush, Drawed_X - r, Drawed_Y - r, 2 * r, 2 * r);
 
                 }
                 mouseWheel = false;
-                g.Dispose();
+                //g.Dispose();
                 pictureBoxForce.Image = bmp;
+                GC.Collect();
             }
         }
 
@@ -540,70 +598,100 @@ namespace guandao
             }
         }
 
+        //上一个实时坐标
+        Point3D RealTimePoint = new Point3D();
         private void serialPort1_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
-            Byte[] InputBuf = new Byte[128];
-            try
+            if (serialPort1.IsOpen)
             {
-                Thread.Sleep(20);
-                serialPort1.Read(InputBuf, 0, serialPort1.BytesToRead);                                //读取缓冲区的数据直到“}”即0x7D为结束符  
-                string str = System.Text.Encoding.Default.GetString(InputBuf);
-
-                str = GetValue(str, "T", "W");
-
-                if (str.Length > 0)
+                try
                 {
-                    str += "W";//方便获取
-                    string x1 = GetValue(str, "x", "y");
-                    string y1 = GetValue(str, "y", "j");
-                    string j1 = GetValue(str, "j", "W");
+                    Thread.Sleep(10);
+                    Byte[] DataReceivedBuf = new Byte[10000];
+                    serialPort1.Read(DataReceivedBuf, 0, serialPort1.BytesToRead);
+                    serialPort1.DiscardInBuffer();//清空缓冲区
+                    string str = System.Text.Encoding.Default.GetString(DataReceivedBuf).Replace("\0", "");
+                    string strr = str;
+                    str = GetValue(str, "T", "W");
 
-                    if (x1.Length > 0 && y1.Length > 0 && j1.Length > 0)
+                    if (str.Length > 0)
                     {
-                        //获取有效坐标
-                        int x = int.Parse(x1);
-                        int y = int.Parse(y1);
-                        int j = int.Parse(j1);
+                        str += "W";//方便获取
+                        string x1 = GetValue(str, "x", "y");
+                        string y1 = GetValue(str, "y", "j");
+                        string j1 = GetValue(str, "j", "W");
 
-                        //设置坐标
-                        if (x < 0)
+                        if (x1.Length > 0 && y1.Length > 0 && j1.Length > 0)
                         {
-                            x = 0;
-                        }
-                        if (y < 0)
-                        {
-                            y = 0;
-                        }
+                            //获取有效坐标
+                            int x = int.Parse(x1);
+                            int y = int.Parse(y1);
+                            int j = int.Parse(j1);
 
-                        if (j < 0)
-                        {
-                            j = 0;
-                        }
-                        this.Invoke(new MethodInvoker(delegate
-                        {
-                            //更新实时坐标
-                            RealTimePointList.Add(new Point3D(x, y, j));
-                            dataGridView_RealTimeXY.DataSource = RealTimePointList.ToArray();
-                            dataGridView_RealTimeXY.FirstDisplayedScrollingRowIndex = dataGridView_RealTimeXY.RowCount - 1;
+                            //设置坐标
+                            if (x < 0)
+                            {
+                                x = 0;
+                            }
+                            if (y < 0)
+                            {
+                                y = 0;
+                            }
 
-                            //绘制定位圆圈
-                            Draw_location(true);
-                        }));
+                            if (j < 0)
+                            {
+                                j = 0;
+                            }
+
+                            if (RealTimePointList.Count == 0)
+                            {
+                                //更新实时坐标
+                                RealTimePointList.Add(new Point3D(x, y, j));
+                                RealTimePoint = RealTimePointList[0];
+                            }
+                            else
+                            if (RealTimePointList.Count == 1)
+                            {
+                                //更新实时坐标
+                                RealTimePointList.Add(new Point3D(x, y, j));
+                                RealTimePoint = RealTimePointList[1];
+                            }
+                            else
+                            {
+                                int x11 = (int)(Math.Abs(RealTimePoint.X - x));
+                                int y11 = (int)(Math.Abs(RealTimePoint.Y - y));
+                                int j11 = (int)(Math.Abs(RealTimePoint.Z - j));
+                                if (x11 < 50 && y11 < 50)
+                                {
+                                    //更新实时坐标
+                                    RealTimePointList.Add(new Point3D(x, y, j));
+                                    RealTimePoint = RealTimePointList[RealTimePointList.Count - 1];
+                                }
+                            }
+
+                            this.Invoke(new MethodInvoker(delegate
+                            {
+                                //显示
+                                textBox_RealTimeXY.AppendText(strr + "\r\n");
+                                textBox_RealTimeXY.AppendText(str + "\r\n");
+                                textBox_RealTimeXY.AppendText("X:" + x.ToString() + " Y:" + y.ToString() + " Z:" + j.ToString() + "\r\n");
+                                //dataGridView_RealTimeXY.DataSource = RealTimePointList.ToArray();
+                                //dataGridView_RealTimeXY.FirstDisplayedScrollingRowIndex = dataGridView_RealTimeXY.RowCount - 1;
+                            }));
+                        }
                     }
                 }
-            }
-            catch (TimeoutException ex)         //超时处理  
-            {
-                MessageBox.Show(ex.ToString());
+                catch (TimeoutException ex)         //超时处理  
+                {
+                    MessageBox.Show(ex.ToString());
+                }
             }
         }
 
         private void pictureBox_location_MouseMove(object sender, MouseEventArgs e)
         {
-            int x = e.X;
-            int y = e.Y;
-
-
+            int x = e.X - CenterPoint.X;
+            int y = e.Y + CenterPoint.Y;
 
             #region 计算捕获坐标
             //计算最近坐标点
@@ -636,8 +724,8 @@ namespace guandao
         public void pictureBox_location_MouseWheel(object sender, MouseEventArgs e)
         {
 
-            int x = e.X;
-            int y = e.Y;
+            int x = e.X - CenterPoint.X;
+            int y = e.Y + CenterPoint.Y;
 
             mouseWheel = true;
 
@@ -668,21 +756,18 @@ namespace guandao
             label_Grid.Text = "Grid:" + Grid.ToString();
 
             //更新原点坐标
-            //point[0] = new Point(0, size.Height / Grid);
+           // CenterPoint = new Point(CenterPoint.X - e.X, CenterPoint.Y - e.Y);
 
             //重绘网格
             Draw_Grid();
             //重绘线段
             ReloadUI();
-
-            //绘制实际路线
-            Draw_location(true);
         }
 
         private void pictureBox_location_MouseClick(object sender, MouseEventArgs e)
         {
-            int x = e.X;
-            int y = e.Y;
+            int x = e.X - CenterPoint.X;
+            int y = e.Y + CenterPoint.Y;
 
             MapMode = true;
 
@@ -827,7 +912,6 @@ namespace guandao
 
         private void button_Clear_Click(object sender, EventArgs e)
         {
-
             DrawPointList.Clear();
             dataGridView_Draw.DataSource = DrawPointList.ToArray();
 
@@ -836,9 +920,6 @@ namespace guandao
 
             //重新加载界面
             ReloadUI();
-
-            //绘制实际路线
-            Draw_location(false);
         }
 
         //手动添加坐标
@@ -885,11 +966,17 @@ namespace guandao
         private void dataGridView_RealTimeXY_RowStateChanged(object sender, DataGridViewRowStateChangedEventArgs e)
         {
             //显示序号在HeaderCell上
-            for (int i = 0; i < this.dataGridView_RealTimeXY.Rows.Count; i++)
-            {
-                DataGridViewRow r = this.dataGridView_RealTimeXY.Rows[i];
-                r.HeaderCell.Value = string.Format("{0}", i + 1);
-            }
+            //for (int i = 0; i < this.dataGridView_RealTimeXY.Rows.Count; i++)
+            //{
+            //    DataGridViewRow r = this.dataGridView_RealTimeXY.Rows[i];
+            //    r.HeaderCell.Value = string.Format("{0}", i + 1);
+            //}
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            //关闭实时位置绘图进程
+            RealTimeThread.Abort();
         }
     }
 }
