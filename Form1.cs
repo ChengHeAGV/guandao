@@ -134,7 +134,7 @@ namespace guandao
             pictureBox_location.BackColor = Color.Transparent;
             pictureBox_location.Parent = pictureBoxForce;
             #endregion
-            RealTimePointList.Add(new Point3D(0, 0, 0));
+            //RealTimePointList.Add(new Point3D(0, 0, 0));
         }
 
         //绘制网格
