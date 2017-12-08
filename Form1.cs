@@ -118,7 +118,7 @@ namespace guandao
             pictureBox_location.BackColor = Color.Transparent;
             pictureBox_location.Parent = pictureBoxForce;
             #endregion
-            //RealTimePointList.Add(new Point3D(10, 10, 145));
+            RealTimePointList.Add(new Point3D(10, 10, 145));
 
             //绘制定位圆圈
             Draw_location(true);
@@ -128,7 +128,7 @@ namespace guandao
         //绘制网格
         void Draw_Grid()
         {
-            //获取绘图区域
+            //获取绘图区域Size
             MapSize = pictureBoxBackGround.Size;
 
             #region 背景图层绘制网格
@@ -144,9 +144,20 @@ namespace guandao
                 //画虚线
                 pen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dot;
 
-                //在图片上画线
+                //在图片上网格线
+                ////横线
+                //for (int i = 0; i < MapSize.Height / Grid + 1; i++)
+                //{
+                //    g.DrawLine(pen, 0, MapSize.Height - Grid * i, MapSize.Width, MapSize.Height - Grid * i);
+                //}
+                ////竖线
+                //for (int i = 0; i < MapSize.Width / Grid + 1; i++)
+                //{
+                //    g.DrawLine(pen, Grid * i, 0, Grid * i, MapSize.Height);
+                //}
+                #region 绘制网格
                 //横线
-                for (int i = 0; i < MapSize.Height / Grid + 1; i++)
+                for (int i = 0; i < (MapSize.Height) / Grid + 1; i++)
                 {
                     g.DrawLine(pen, 0, MapSize.Height - Grid * i, MapSize.Width, MapSize.Height - Grid * i);
                 }
@@ -155,6 +166,8 @@ namespace guandao
                 {
                     g.DrawLine(pen, Grid * i, 0, Grid * i, MapSize.Height);
                 }
+                #endregion
+
                 g.Dispose();
             }
             pictureBoxBackGround.Image = bmp;
@@ -166,14 +179,14 @@ namespace guandao
         void Draw_location(bool dis)
         {
             //当前位置指示器直径
-            int Radius = 30;
+            int Radius = 20;
 
             Bitmap bmp = new Bitmap(MapSize.Width, MapSize.Height);
             Graphics g = Graphics.FromImage(bmp);
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
             g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            Brush bush = new SolidBrush(Color.Orange);//填充的颜色
+            Brush bush = new SolidBrush(Color.OrangeRed);//填充的颜色
 
             //画已经绘制的线段
             if (RealTimePointList.Count >= 2)
@@ -189,7 +202,7 @@ namespace guandao
             if (dis && RealTimePointList.Count > 0)
             {
                 //画三角形
-                float d = 70;
+                float d = 45;
                 float angle = RealTimePointList[RealTimePointList.Count - 1].Z;
                 Point center = new Point();
                 Point[] point = new Point[3];
@@ -198,8 +211,6 @@ namespace guandao
 
                 point[0].X = (int)(center.X + (float)(Math.Cos(Math.PI * (angle / 180.0)) * d));
                 point[0].Y = (int)(center.Y - (float)(Math.Sin(Math.PI * (angle / 180.0)) * d));
-
-
 
                 double Q1 = angle;
                 double Q2 = Math.Acos(Radius / d) * 180 / Math.PI;
@@ -217,10 +228,10 @@ namespace guandao
                 g.FillPolygon(bush, point);
 
                 //画角度线
-
-                g.DrawLine(new Pen(Color.Red, 3), center.X, center.Y, point[0].X, point[0].Y);
+                //g.DrawLine(new Pen(Color.Red, 1), center.X, center.Y, point[0].X, point[0].Y);
 
                 //画圆
+                bush = new SolidBrush(Color.Orange);//填充的颜色
                 g.FillEllipse(bush, center.X - Radius, center.Y - Radius, Radius * 2, Radius * 2);
             }
 
@@ -245,8 +256,11 @@ namespace guandao
                     //更新DataGridView显示
                     dataGridView_Draw.DataSource = DrawPointList.ToArray();
                     dataGridView_DrawDelete.DataSource = DrawPointListDelete.ToArray();
-                    dataGridView_Draw.FirstDisplayedScrollingRowIndex = dataGridView_Draw.RowCount - 1;
-                    dataGridView_DrawDelete.FirstDisplayedScrollingRowIndex = dataGridView_DrawDelete.RowCount - 1;
+                    //显示最后一行
+                    if (dataGridView_Draw.RowCount > 0)
+                        dataGridView_Draw.FirstDisplayedScrollingRowIndex = dataGridView_Draw.RowCount - 1;
+                    if (dataGridView_DrawDelete.RowCount > 0)
+                        dataGridView_DrawDelete.FirstDisplayedScrollingRowIndex = dataGridView_DrawDelete.RowCount - 1;
 
                     //重绘界面
                     ReloadUI();
@@ -274,8 +288,11 @@ namespace guandao
                     //更新DataGridView显示
                     dataGridView_Draw.DataSource = DrawPointList.ToArray();
                     dataGridView_DrawDelete.DataSource = DrawPointListDelete.ToArray();
-                    dataGridView_Draw.FirstDisplayedScrollingRowIndex = dataGridView_Draw.RowCount - 1;
-                    dataGridView_DrawDelete.FirstDisplayedScrollingRowIndex = dataGridView_DrawDelete.RowCount - 1;
+                    //显示最后一行
+                    if (dataGridView_Draw.RowCount > 0)
+                        dataGridView_Draw.FirstDisplayedScrollingRowIndex = dataGridView_Draw.RowCount - 1;
+                    if (dataGridView_DrawDelete.RowCount > 0)
+                        dataGridView_DrawDelete.FirstDisplayedScrollingRowIndex = dataGridView_DrawDelete.RowCount - 1;
 
                     //重绘界面
                     ReloadUI();
@@ -288,8 +305,12 @@ namespace guandao
         //重新加载界面
         void ReloadUI()
         {
+            //当前光标位置
             int x = NowPoint.X * Grid;
             int y = MapSize.Height - NowPoint.Y * Grid;
+
+            //临时公用坐标变量
+            //Point point = new Point(); 
 
             if (MapMode)
             {
@@ -313,6 +334,7 @@ namespace guandao
                 {
                     for (int i = 0; i < DrawPointList.Count - 1; i++)
                     {
+
                         //画已经绘制的线段
                         g.DrawLine(new Pen(Color.White, 2), DrawPointList[i].X * Grid, MapSize.Height - DrawPointList[i].Y * Grid, DrawPointList[i + 1].X * Grid, MapSize.Height - DrawPointList[i + 1].Y * Grid);
                         //画小叉号
@@ -344,20 +366,25 @@ namespace guandao
                 {
                     for (int i = 0; i < DrawPointList.Count - 1; i++)
                     {
+                        int Drawed_X = (DrawPointList[i].X+MapSize.Width/Grid/2) * Grid;
+                        int Drawed_Y = MapSize.Height - (DrawPointList[i].Y + MapSize.Height / Grid / 2) * Grid;
+
+                        int Drawed_X1 = (DrawPointList[i+1].X + MapSize.Width / Grid / 2) * Grid;
+                        int Drawed_Y1 = MapSize.Height - (DrawPointList[i+1].Y + MapSize.Height / Grid / 2) * Grid;
 
                         if (mouseWheel)
                         {
                             //画已经绘制的线段
-                            g.DrawLine(new Pen(Color.Blue, 3), DrawPointList[i].X * Grid, MapSize.Height - DrawPointList[i].Y * Grid, DrawPointList[i + 1].X * Grid, MapSize.Height - DrawPointList[i + 1].Y * Grid);
+                            g.DrawLine(new Pen(Color.Blue, 3), Drawed_X, Drawed_Y, Drawed_X1, Drawed_Y1);
                             //在拐点处画圆
-                            g.FillEllipse(bush, (DrawPointList[i].X * Grid) - r, MapSize.Height - (DrawPointList[i].Y * Grid) - r, 2 * r, 2 * r);
+                            g.FillEllipse(bush, Drawed_X - r, Drawed_Y - r, 2 * r, 2 * r);
                         }
                         else
                         {
                             //画已经绘制的线段
-                            g.DrawLine(new Pen(Color.Blue, 3), DrawPointList[i].X * Grid, MapSize.Height - DrawPointList[i].Y * Grid, DrawPointList[i + 1].X * Grid, MapSize.Height - DrawPointList[i + 1].Y * Grid);
+                            g.DrawLine(new Pen(Color.Blue, 3), Drawed_X, Drawed_Y, Drawed_X1, Drawed_Y1);
                             //在拐点处画圆
-                            g.FillEllipse(bush, DrawPointList[i].X * Grid - r, MapSize.Height - DrawPointList[i].Y * Grid - r, 2 * r, 2 * r);
+                            g.FillEllipse(bush, Drawed_X - r, Drawed_Y - r, 2 * r, 2 * r);
                         }
                     }
                 }
@@ -366,9 +393,9 @@ namespace guandao
                     //在拐点处画圆
                     int i = DrawPointList.Count - 1;
                     if (mouseWheel)
-                        g.FillEllipse(bush, (DrawPointList[i].X * Grid) - r, (MapSize.Height - DrawPointList[i].Y * Grid - r), 2 * r, 2 * r);
+                        g.FillEllipse(bush, ((DrawPointList[i].X + MapSize.Width / Grid / 2) * Grid) - r, (MapSize.Height - (DrawPointList[i].Y + MapSize.Height / Grid / 2) * Grid - r), 2 * r, 2 * r);
                     else
-                        g.FillEllipse(bush, DrawPointList[i].X * Grid - r, MapSize.Height - DrawPointList[i].Y * Grid - r, 2 * r, 2 * r);
+                        g.FillEllipse(bush, (DrawPointList[i].X + MapSize.Width / Grid / 2) * Grid - r, MapSize.Height - (DrawPointList[i].Y + MapSize.Height / Grid / 2) * Grid - r, 2 * r, 2 * r);
 
                 }
                 mouseWheel = false;
@@ -804,6 +831,9 @@ namespace guandao
             DrawPointList.Clear();
             dataGridView_Draw.DataSource = DrawPointList.ToArray();
 
+            RealTimePointList.Clear();
+            dataGridView_RealTimeXY.DataSource = RealTimePointList.ToArray();
+
             //重新加载界面
             ReloadUI();
 
@@ -830,6 +860,36 @@ namespace guandao
             {
             }
 
+        }
+
+        private void dataGridView_Draw_RowStateChanged(object sender, DataGridViewRowStateChangedEventArgs e)
+        {
+            //显示序号在HeaderCell上
+            for (int i = 0; i < this.dataGridView_Draw.Rows.Count; i++)
+            {
+                DataGridViewRow r = this.dataGridView_Draw.Rows[i];
+                r.HeaderCell.Value = string.Format("{0}", i + 1);
+            }
+        }
+
+        private void dataGridView_DrawDelete_RowStateChanged(object sender, DataGridViewRowStateChangedEventArgs e)
+        {
+            //显示序号在HeaderCell上
+            for (int i = 0; i < this.dataGridView_DrawDelete.Rows.Count; i++)
+            {
+                DataGridViewRow r = this.dataGridView_DrawDelete.Rows[i];
+                r.HeaderCell.Value = string.Format("{0}", i + 1);
+            }
+        }
+
+        private void dataGridView_RealTimeXY_RowStateChanged(object sender, DataGridViewRowStateChangedEventArgs e)
+        {
+            //显示序号在HeaderCell上
+            for (int i = 0; i < this.dataGridView_RealTimeXY.Rows.Count; i++)
+            {
+                DataGridViewRow r = this.dataGridView_RealTimeXY.Rows[i];
+                r.HeaderCell.Value = string.Format("{0}", i + 1);
+            }
         }
     }
 }
