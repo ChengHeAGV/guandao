@@ -59,7 +59,6 @@ namespace guandao
 
             //注册鼠标滚轮事件
             this.pictureBox_location.MouseWheel += new MouseEventHandler(pictureBox_location_MouseWheel);
-            dataGridView_Draw.DataSource = DrawPointList.ToArray();
 
             #region 串口初始化
             button1_openclose.Text = "打开串口";
@@ -184,7 +183,7 @@ namespace guandao
         }
 
         //实时位置绘制
-        private void Thread_DrawRealTimePoint()
+       private void Thread_DrawRealTimePoint()
         {
             //当实时坐标变化时重新绘制
             while (true)
@@ -509,14 +508,8 @@ namespace guandao
                     DrawPointList.Add(DrawPointListDelete[DrawPointListDelete.Count - 1]);
                     //删除最后一个坐标
                     DrawPointListDelete.RemoveAt(DrawPointListDelete.Count - 1);
-                    //更新DataGridView显示
-                    dataGridView_Draw.DataSource = DrawPointList.ToArray();
-                    dataGridView_DrawDelete.DataSource = DrawPointListDelete.ToArray();
-                    //显示最后一行
-                    if (dataGridView_Draw.RowCount > 0)
-                        dataGridView_Draw.FirstDisplayedScrollingRowIndex = dataGridView_Draw.RowCount - 1;
-                    if (dataGridView_DrawDelete.RowCount > 0)
-                        dataGridView_DrawDelete.FirstDisplayedScrollingRowIndex = dataGridView_DrawDelete.RowCount - 1;
+                    //更新路径长度显示
+                    labelRouteLength.Text = DrawPointList.Count.ToString();
 
                     //重绘界面
                     if (MapMode)
@@ -543,15 +536,10 @@ namespace guandao
                     DrawPointListDelete.Add(DrawPointList[DrawPointList.Count - 1]);
                     //删除最后一个坐标
                     DrawPointList.RemoveAt(DrawPointList.Count - 1);
-                    //更新DataGridView显示
-                    dataGridView_Draw.DataSource = DrawPointList.ToArray();
-                    dataGridView_DrawDelete.DataSource = DrawPointListDelete.ToArray();
-                    //显示最后一行
-                    if (dataGridView_Draw.RowCount > 0)
-                        dataGridView_Draw.FirstDisplayedScrollingRowIndex = dataGridView_Draw.RowCount - 1;
-                    if (dataGridView_DrawDelete.RowCount > 0)
-                        dataGridView_DrawDelete.FirstDisplayedScrollingRowIndex = dataGridView_DrawDelete.RowCount - 1;
-
+                   
+                    //更新路径长度显示
+                    labelRouteLength.Text = DrawPointList.Count.ToString();
+                    
                     //重绘界面
                     if (MapMode)
                         UpdateDraws.UpdateDrawingMap = true;
@@ -564,6 +552,648 @@ namespace guandao
             }
         }
 
+        //上一个实时坐标
+        Point3D RealTimePoint = new Point3D();
+        private void serialPort1_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
+        {
+            if (serialPort1.IsOpen)
+            {
+                try
+                {
+                    Thread.Sleep(10);
+                    Byte[] DataReceivedBuf = new Byte[10000];
+                    serialPort1.Read(DataReceivedBuf, 0, serialPort1.BytesToRead);
+                    serialPort1.DiscardInBuffer();//清空缓冲区
+                    string str = System.Text.Encoding.Default.GetString(DataReceivedBuf).Replace("\0", "");
+                    string strr = str;
+                    str = GetValue(str, "T", "W");
+
+                    if (str.Length > 0)
+                    {
+                        str += "W";//方便获取
+                        string x1 = GetValue(str, "x", "y");
+                        string y1 = GetValue(str, "y", "j");
+                        string j1 = GetValue(str, "j", "W");
+
+                        if (x1.Length > 0 && y1.Length > 0 && j1.Length > 0)
+                        {
+                            //获取有效坐标
+                            int x = int.Parse(x1);
+                            int y = int.Parse(y1);
+                            int j = int.Parse(j1);
+
+                            //设置坐标
+                            if (x < 0)
+                            {
+                                x = 0;
+                            }
+                            if (y < 0)
+                            {
+                                y = 0;
+                            }
+
+                            if (j < 0)
+                            {
+                                j = 0;
+                            }
+
+                            if (RealTimePointList.Count == 0)
+                            {
+                                //更新实时坐标
+                                RealTimePointList.Add(new Point3D(x, y, j));
+                                RealTimePoint = RealTimePointList[0];
+                                UpdateDraws.UpdateRealTimeMap = true;
+                            }
+                            else
+                            if (RealTimePointList.Count == 1)
+                            {
+                                //更新实时坐标
+                                RealTimePointList.Add(new Point3D(x, y, j));
+                                RealTimePoint = RealTimePointList[1];
+                                UpdateDraws.UpdateRealTimeMap = true;
+                            }
+                            else
+                            {
+                                int x11 = (int)(Math.Abs(RealTimePoint.X - x));
+                                int y11 = (int)(Math.Abs(RealTimePoint.Y - y));
+                                int j11 = (int)(Math.Abs(RealTimePoint.Z - j));
+                                if (x11 < 50 && y11 < 50)
+                                {
+                                    //更新实时坐标
+                                    RealTimePointList.Add(new Point3D(x, y, j));
+                                    RealTimePoint = RealTimePointList[RealTimePointList.Count - 1];
+                                }
+                                UpdateDraws.UpdateRealTimeMap = true;
+                            }
+
+                            this.Invoke(new MethodInvoker(delegate
+                            {
+                                //显示
+                                labelRealTimeXYZ.Text = string.Format("X:{0}Y:{1}Z:{2}",x,y,j);
+                            }));
+                        }
+                    }
+                }
+                catch (TimeoutException ex)//超时处理  
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+            }
+        }
+
+        private void pictureBox_location_MouseMove(object sender, MouseEventArgs e)
+        {
+            int x = e.X;
+            int y = MapSize.Height - e.Y;
+
+            #region 计算捕获坐标
+            //计算最近坐标点
+            int xval = x % Grid;
+            int yval = y % Grid;
+            if (xval > (Grid / 2))
+                x += Grid - xval;
+            else
+                x -= xval;
+            if (yval > (Grid / 2))
+                y += Grid - yval;
+            else
+                y -= yval;
+            #endregion
+            x = x / Grid - 1;
+            y = y / Grid - 1;
+
+            if (MapMode)
+            {
+                //计算偏差移动造成的偏差
+                x -= CenterPoint.Now.X - CenterPoint.Init.X;
+                y -= CenterPoint.Now.Y - CenterPoint.Init.Y;
+            }
+
+            //空格键按下了
+            if (KeySpace)
+            {
+                //设置光标为手型
+                this.Cursor = Cursors.Hand;
+                CenterPoint.Now.X += x - NowPoint.X;
+                CenterPoint.Now.Y += y - NowPoint.Y;
+                UpdateDraws.UpdateDrawedMap = true;
+                UpdateDraws.UpdateRealTimeMap = true;
+            }
+            else
+                //设置光标为箭头
+                this.Cursor = Cursors.Arrow;
+
+            NowPoint.X = x;
+            NowPoint.Y = y;
+
+            //显示坐标到界面
+            label_XY.Text = "X:" + x.ToString() + " Y:" + y.ToString();
+            label_True_XY.Text = "X:" + (NowPoint.X).ToString() + "CM Y:" + (NowPoint.Y).ToString() + "CM";
+
+            //重新加载界面
+            if (MapMode)
+                UpdateDraws.UpdateDrawingMap = true;
+        }
+
+        public void pictureBox_location_MouseWheel(object sender, MouseEventArgs e)
+        {
+            mouseWheel = true;
+            if (e.Delta > 0)
+            {
+                if (Grid > 5)
+                {
+                    Grid -= 5;
+                }
+                else if (Grid > 1)
+                {
+                    Grid -= 1;
+                }
+            }
+            else
+            {
+                if (Grid < 400)
+                {
+                    if (Grid < 5)
+                    {
+                        Grid += 1;
+                    }
+                    else
+                        Grid += 5;
+                }
+            }
+
+            label_Grid.Text = "Grid:" + Grid.ToString();
+
+            //根据偏差重置中心点坐标
+            if (Grid != 1 && Grid != 400)
+            {
+                CenterPoint.Now.X += (MapSize.Width / Grid / 2 - NowPoint.X) / 1;
+                CenterPoint.Now.Y += (MapSize.Height / Grid / 2 - NowPoint.Y) / 1;
+            }
+
+            //重绘网格
+            UpdateDraws.UpdateGrid = true;
+            //重绘实时坐标
+            UpdateDraws.UpdateRealTimeMap = true;
+            //重绘线段
+            if (MapMode)
+                UpdateDraws.UpdateDrawingMap = true;
+            else
+                UpdateDraws.UpdateDrawedMap = true;
+        }
+
+        private void pictureBox_location_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (MapMode == false)
+            {
+                return;
+            }
+            int x = e.X;
+            int y = MapSize.Height - e.Y;
+
+            #region 计算捕获坐标
+            //计算最近坐标点
+            int xval = x % Grid;
+            int yval = y % Grid;
+            if (xval > (Grid / 2))
+                x += Grid - xval;
+            else
+                x -= xval;
+            if (yval > (Grid / 2))
+                y += Grid - yval;
+            else
+                y -= yval;
+            #endregion
+            x = x / Grid - 1;
+            y = y / Grid - 1;
+
+            if (MapMode)
+            {
+                //计算偏差移动造成的偏差
+                x -= CenterPoint.Now.X - CenterPoint.Init.X;
+                y -= CenterPoint.Now.Y - CenterPoint.Init.Y;
+            }
+
+            NowPoint.X = x;
+            NowPoint.Y = y;
+
+            if (e.Button == MouseButtons.Left && e.Clicks == 1)
+            {
+                //单击了鼠标左键,添加坐标到坐标集合
+                DrawPointList.Add(NowPoint);
+                labelRouteLength.Text = DrawPointList.Count.ToString();
+            }
+            else if (e.Button == MouseButtons.Right && e.Clicks == 1)
+            {
+                //单击了鼠标右键，退出绘图模式
+                MapMode = false;
+                UpdateDraws.UpdateDrawedMap = true;
+            }
+
+            label1.Text = DrawPointList.Count.ToString();
+            label2.Text = DrawPointListDelete.Count.ToString();
+        }
+
+        private void pictureBox_location_MouseEnter(object sender, EventArgs e)
+        {
+            //控件获取焦点后滚轮事件才有效
+            this.pictureBox_location.Focus();
+        }
+
+        private void button1_openclose_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (button1_openclose.Text == "打开串口")
+                {
+                    serialPort1.PortName = comboBox1_PortName.SelectedItem.ToString();
+                    serialPort1.BaudRate = int.Parse(comboBox2_BaudRate.SelectedItem.ToString());
+                    serialPort1.Open();
+                    serialPort1.DataReceived += serialPort1_DataReceived;
+                    button1_openclose.Text = "关闭串口";
+                    label5_LED.ForeColor = Color.Red;
+                }
+                else
+                {
+                    serialPort1.Close();
+                    button1_openclose.Text = "打开串口";
+                    label5_LED.ForeColor = Color.Black;
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("打开串口失败,串口被占用或选择正确的串口!", "错误提示");
+            }
+        }
+
+        private void comboBox2_BaudRate_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            serialPort1.BaudRate = int.Parse(comboBox2_BaudRate.SelectedItem.ToString());
+            //存储PortName
+            Ini.Write("串口配置", "BaudRate", comboBox2_BaudRate.SelectedIndex.ToString());
+        }
+
+        private void comboBox1_PortName_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            if (serialPort1.IsOpen)
+            {
+                serialPort1.Close();
+            }
+            try
+            {
+                serialPort1.PortName = comboBox1_PortName.SelectedItem.ToString();
+                serialPort1.Open();
+                button1_openclose.Text = "关闭串口";
+                label5_LED.ForeColor = Color.Red;
+
+                //存储PortName
+                Ini.Write("串口配置", "PortName", serialPort1.PortName);
+            }
+            catch (Exception)
+            {
+                serialPort1.Close();
+                button1_openclose.Text = "打开串口";
+                label5_LED.ForeColor = Color.Black;
+                MessageBox.Show("打开串口失败,串口被占用或选择正确的串口!", "错误提示");
+            }
+        }
+
+        //手动添加坐标
+        private void button_add_point_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                //添加点
+                int x = int.Parse(textBox_AddX.Text.Trim());
+                int y = int.Parse(textBox_AddY.Text.Trim());
+
+                DrawPointList.Add(new Point(x, y));
+                labelRouteLength.Text = DrawPointList.Count.ToString();
+
+                //更新界面
+                MapMode = false;
+                UpdateDraws.UpdateDrawedMap = true;
+            }
+            catch
+            {
+            }
+
+        }
+
+        private void dataGridView_RealTimeXY_RowStateChanged(object sender, DataGridViewRowStateChangedEventArgs e)
+        {
+            //显示序号在HeaderCell上
+            //for (int i = 0; i < this.dataGridView_RealTimeXY.Rows.Count; i++)
+            //{
+            //    DataGridViewRow r = this.dataGridView_RealTimeXY.Rows[i];
+            //    r.HeaderCell.Value = string.Format("{0}", i + 1);
+            //}
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            //关闭实时位置绘图进程
+            ThreadRealTime.Abort();
+            //关闭网格绘制线程
+            ThreadDrawGrid.Abort();
+            //关闭画图绘制线程
+            ThreadDrawMap.Abort();
+        }
+
+        private void button_DrawRoute_Click(object sender, EventArgs e)
+        {
+            MapMode = true;
+        }
+
+        private void pictureBox_location_MouseDown(object sender, MouseEventArgs e)
+        {
+            //移动地图
+            if (e.Button == MouseButtons.Right)
+            {
+                if (MapMode == false)
+                {
+                    KeySpace = true;
+                    CenterPoint.MoveAgo.X = CenterPoint.Now.X;
+                    CenterPoint.MoveAgo.Y = CenterPoint.Now.Y;
+                }
+            }
+        }
+
+        private void pictureBox_location_MouseUp(object sender, MouseEventArgs e)
+        {
+            //移动地图
+            if (KeySpace)
+            {
+                UpdateDraws.UpdateGrid = true;
+                UpdateDraws.UpdateDrawedMap = true;
+            }
+            KeySpace = false;
+        }
+
+        //窗口尺寸变化时更新界面
+        private void Form1_Resize(object sender, EventArgs e)
+        {
+            //重绘地图
+            UpdateDraws.UpdateGrid = true;
+            UpdateDraws.UpdateRealTimeMap = true;
+            if (MapMode)
+                UpdateDraws.UpdateDrawingMap = true;
+            else
+                UpdateDraws.UpdateDrawedMap = true;
+        }
+
+
+        #region 按钮事件
+        //清除轨迹
+        private void buttonClearRealTime_Click(object sender, EventArgs e)
+        {
+            //清空实时坐标
+            RealTimePointList.Clear();
+            labelRealTimeXYZ.Text = "X:0 Y:0 Z:0";
+            
+            //重绘实时位置
+            UpdateDraws.UpdateRealTimeMap = true;
+        }
+
+        //加载轨迹
+        private void buttonLoadRealTime_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog file = new OpenFileDialog();
+            file.Filter = "文本文件|*.xml";
+            if (file.ShowDialog() == DialogResult.OK)
+            {
+                ////清空子节点
+                //node_parment.Nodes.Clear();
+                //node_lujingparment.Nodes.Clear();
+
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(file.FileName);
+
+                XmlNode xn = xmlDoc.SelectSingleNode("Flash参数");
+
+                XmlNodeList xnn = xn.ChildNodes;
+
+                int j = 0;
+                foreach (XmlNode xnk in xnn)
+                {
+
+                    if (xnk.Name == "路径参数")
+                    {
+                        j = 0; RealTimePointList.Clear();
+                        XmlElement xe = (XmlElement)xnk;
+                        XmlNodeList xnm = xe.ChildNodes;
+                        foreach (XmlNode xnkk in xnm)
+                        {
+                            XmlElement xee = (XmlElement)xnkk;
+                            XmlNodeList xng = xee.ChildNodes;
+                            foreach (XmlNode xnkkk in xng)
+                            {
+                                RealTimePointList.Add(new Point3D(int.Parse(xnkkk.ChildNodes[1].ChildNodes.Item(3).InnerText.ToString()), int.Parse(xnkkk.ChildNodes[2].ChildNodes.Item(3).InnerText.ToString()), 0));
+                            }
+                            j++;
+                        }
+                    }
+                }
+                //重绘实时位置
+                UpdateDraws.UpdateRealTimeMap = true;
+            }
+        }
+
+        //保存轨迹
+        private void buttonSaveRealTime_Click(object sender, EventArgs e)
+        {
+            if (RealTimePointList.Count > 1)
+            {
+                SaveFileDialog file1 = new SaveFileDialog();
+                file1.Filter = "文本文件|*.xml";
+                if (file1.ShowDialog() == DialogResult.OK)
+                {
+                    XmlTextWriter writer = new XmlTextWriter(file1.FileName, null);
+                    //使用自动缩进便于阅读
+                    writer.Formatting = Formatting.Indented;
+
+                    //写入根元素
+                    writer.WriteStartElement("Flash参数");
+
+                    writer.WriteStartElement("系统参数");
+                    //加入子元素
+                    for (int i = 0; i < 101; i++)
+                    {
+                        writer.WriteStartElement("参数" + i.ToString());
+                        writer.WriteElementString("参数号", i.ToString());
+                        writer.WriteElementString("参数名", "");
+                        if (i == 99)//路径数
+                        {
+                            writer.WriteElementString("当前值", "1");
+                            writer.WriteElementString("设定值", "1");
+                        }
+                        else if (i == 96)//站点包含信息数
+                        {
+                            writer.WriteElementString("当前值", "10");
+                            writer.WriteElementString("设定值", "10");
+                        }
+                        else
+                        {
+                            writer.WriteElementString("当前值", "0");
+                            writer.WriteElementString("设定值", "0");
+                        }
+
+                        writer.WriteElementString("描述", "");
+                        writer.WriteEndElement();
+                    }
+                    writer.WriteEndElement();
+
+
+                    writer.WriteStartElement("路径参数");
+                    //加入子元素
+                    for (int i = 0; i < 1; i++)
+                    {
+                        writer.WriteStartElement("路径" + (i + 1).ToString());
+                        for (int j = 0; j < RealTimePointList.Count; j++)
+                        {
+                            writer.WriteStartElement("站点" + (j + 1).ToString());
+                            //站点信息  
+                            writer.WriteStartElement("参数0");
+                            writer.WriteElementString("参数号", "1");
+                            writer.WriteElementString("参数名", " ");
+                            writer.WriteElementString("当前值", "0");
+                            writer.WriteElementString("设定值", "0");
+                            writer.WriteElementString("描述", "X坐标，单位CM");
+                            writer.WriteEndElement();
+
+                            writer.WriteStartElement("参数1");
+                            writer.WriteElementString("参数号", "2");
+                            writer.WriteElementString("参数名", "X");
+                            writer.WriteElementString("当前值", RealTimePointList[j].X.ToString());
+                            writer.WriteElementString("设定值", RealTimePointList[j].X.ToString());
+                            writer.WriteElementString("描述", "X坐标，单位CM");
+                            writer.WriteEndElement();
+
+                            writer.WriteStartElement("参数2");
+                            writer.WriteElementString("参数号", "3");
+                            writer.WriteElementString("参数名", "Y");
+                            writer.WriteElementString("当前值", RealTimePointList[j].Y.ToString());
+                            writer.WriteElementString("设定值", RealTimePointList[j].Y.ToString());
+                            writer.WriteElementString("描述", "Y坐标，单位CM");
+                            writer.WriteEndElement();
+
+                            for (int k = 0; k < 2; k++)
+                            {
+                                writer.WriteStartElement("参数" + (k + 3).ToString());
+                                writer.WriteElementString("参数号", (k + 4).ToString());
+                                writer.WriteElementString("参数名", "未定义");
+                                writer.WriteElementString("当前值", "0");
+                                writer.WriteElementString("设定值", "0");
+                                writer.WriteElementString("描述", "");
+                                writer.WriteEndElement();
+                            }
+
+                            writer.WriteStartElement("参数5");
+                            writer.WriteElementString("参数号", "6");
+                            writer.WriteElementString("参数名", "动作");
+                            if (j == (DrawPointList.Count - 1))
+                            {
+                                writer.WriteElementString("当前值", "1");
+                                writer.WriteElementString("设定值", "1");
+                            }
+                            else
+                            {
+                                writer.WriteElementString("当前值", "0");
+                                writer.WriteElementString("设定值", "0");
+                            }
+
+                            writer.WriteElementString("描述", "0:保持 1:停止 2:前进");
+                            writer.WriteEndElement();
+
+                            for (int k = 0; k < 5; k++)
+                            {
+                                writer.WriteStartElement("参数" + (k + 7).ToString());
+                                writer.WriteElementString("参数号", (k + 8).ToString());
+                                writer.WriteElementString("参数名", "未定义");
+                                writer.WriteElementString("当前值", "0");
+                                writer.WriteElementString("设定值", "0");
+                                writer.WriteElementString("描述", "");
+                                writer.WriteEndElement();
+                            }
+
+                            writer.WriteEndElement();
+                        }
+                        writer.WriteEndElement();
+                    }
+
+                    writer.WriteEndElement();
+                    //关闭根元素，并书写结束标签
+                    writer.WriteEndElement();
+                    //将XML写入文件并且关闭XmlTextWriter
+                    writer.Close();
+                }
+            }
+            else
+            {
+                MessageBox.Show("没有路径可保存到PC！", "提示");
+            }
+        }
+
+        //清除地图
+        private void button_Clear_Click(object sender, EventArgs e)
+        {
+            //清空地图坐标，加入原点坐标
+            DrawPointList.Clear();
+            DrawPointList.Add(new Point(0, 0));
+            labelRouteLength.Text = DrawPointList.Count.ToString();
+
+            //设置为非绘图模式
+            MapMode = false;
+            //重绘地图
+            UpdateDraws.UpdateDrawedMap = true;
+        }
+
+        //加载地图
+        private void button_loadmap_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog file = new OpenFileDialog();
+            file.Filter = "文本文件|*.xml";
+            if (file.ShowDialog() == DialogResult.OK)
+            {
+                ////清空子节点
+                //node_parment.Nodes.Clear();
+                //node_lujingparment.Nodes.Clear();
+
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(file.FileName);
+
+                XmlNode xn = xmlDoc.SelectSingleNode("Flash参数");
+
+                XmlNodeList xnn = xn.ChildNodes;
+
+                int j = 0;
+                foreach (XmlNode xnk in xnn)
+                {
+
+                    if (xnk.Name == "路径参数")
+                    {
+                        j = 0; DrawPointList.Clear();
+                        XmlElement xe = (XmlElement)xnk;
+                        XmlNodeList xnm = xe.ChildNodes;
+                        foreach (XmlNode xnkk in xnm)
+                        {
+                            XmlElement xee = (XmlElement)xnkk;
+                            XmlNodeList xng = xee.ChildNodes;
+                            foreach (XmlNode xnkkk in xng)
+                            {
+                                DrawPointList.Add(new Point(int.Parse(xnkkk.ChildNodes[1].ChildNodes.Item(3).InnerText.ToString()), int.Parse(xnkkk.ChildNodes[2].ChildNodes.Item(3).InnerText.ToString())));
+                            }
+                            j++;
+                        }
+                    }
+                }
+                labelRouteLength.Text = DrawPointList.Count.ToString();
+                //重绘地图
+                UpdateDraws.UpdateDrawedMap = true;
+            }
+        }
+
+        //保存路径
         private void button_saveRoute_Click(object sender, EventArgs e)
         {
             if (DrawPointList.Count > 1)
@@ -699,479 +1329,7 @@ namespace guandao
                 MessageBox.Show("没有路径可保存到PC！", "提示");
             }
         }
+        #endregion
 
-        //上一个实时坐标
-        Point3D RealTimePoint = new Point3D();
-        private void serialPort1_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
-        {
-            if (serialPort1.IsOpen)
-            {
-                try
-                {
-                    Thread.Sleep(10);
-                    Byte[] DataReceivedBuf = new Byte[10000];
-                    serialPort1.Read(DataReceivedBuf, 0, serialPort1.BytesToRead);
-                    serialPort1.DiscardInBuffer();//清空缓冲区
-                    string str = System.Text.Encoding.Default.GetString(DataReceivedBuf).Replace("\0", "");
-                    string strr = str;
-                    str = GetValue(str, "T", "W");
-
-                    if (str.Length > 0)
-                    {
-                        str += "W";//方便获取
-                        string x1 = GetValue(str, "x", "y");
-                        string y1 = GetValue(str, "y", "j");
-                        string j1 = GetValue(str, "j", "W");
-
-                        if (x1.Length > 0 && y1.Length > 0 && j1.Length > 0)
-                        {
-                            //获取有效坐标
-                            int x = int.Parse(x1);
-                            int y = int.Parse(y1);
-                            int j = int.Parse(j1);
-
-                            //设置坐标
-                            if (x < 0)
-                            {
-                                x = 0;
-                            }
-                            if (y < 0)
-                            {
-                                y = 0;
-                            }
-
-                            if (j < 0)
-                            {
-                                j = 0;
-                            }
-
-                            if (RealTimePointList.Count == 0)
-                            {
-                                //更新实时坐标
-                                RealTimePointList.Add(new Point3D(x, y, j));
-                                RealTimePoint = RealTimePointList[0];
-                                UpdateDraws.UpdateRealTimeMap = true;
-                            }
-                            else
-                            if (RealTimePointList.Count == 1)
-                            {
-                                //更新实时坐标
-                                RealTimePointList.Add(new Point3D(x, y, j));
-                                RealTimePoint = RealTimePointList[1];
-                                UpdateDraws.UpdateRealTimeMap = true;
-                            }
-                            else
-                            {
-                                int x11 = (int)(Math.Abs(RealTimePoint.X - x));
-                                int y11 = (int)(Math.Abs(RealTimePoint.Y - y));
-                                int j11 = (int)(Math.Abs(RealTimePoint.Z - j));
-                                if (x11 < 50 && y11 < 50)
-                                {
-                                    //更新实时坐标
-                                    RealTimePointList.Add(new Point3D(x, y, j));
-                                    RealTimePoint = RealTimePointList[RealTimePointList.Count - 1];
-                                }
-                                UpdateDraws.UpdateRealTimeMap = true;
-                            }
-
-                            this.Invoke(new MethodInvoker(delegate
-                            {
-                                //显示
-                                textBox_RealTimeXY.AppendText(strr + "\r\n");
-                                textBox_RealTimeXY.AppendText(str + "\r\n");
-                                textBox_RealTimeXY.AppendText("X:" + x.ToString() + " Y:" + y.ToString() + " Z:" + j.ToString() + "\r\n");
-                            }));
-                        }
-                    }
-                }
-                catch (TimeoutException ex)//超时处理  
-                {
-                    MessageBox.Show(ex.ToString());
-                }
-            }
-        }
-
-        private void pictureBox_location_MouseMove(object sender, MouseEventArgs e)
-        {
-            int x = e.X;
-            int y = MapSize.Height - e.Y;
-
-            #region 计算捕获坐标
-            //计算最近坐标点
-            int xval = x % Grid;
-            int yval = y % Grid;
-            if (xval > (Grid / 2))
-                x += Grid - xval;
-            else
-                x -= xval;
-            if (yval > (Grid / 2))
-                y += Grid - yval;
-            else
-                y -= yval;
-            #endregion
-            x = x / Grid - 1;
-            y = y / Grid - 1;
-
-            if (MapMode)
-            {
-                //计算偏差移动造成的偏差
-                x -= CenterPoint.Now.X - CenterPoint.Init.X;
-                y -= CenterPoint.Now.Y - CenterPoint.Init.Y;
-            }
-
-            //空格键按下了
-            if (KeySpace)
-            {
-                //设置光标为手型
-                this.Cursor = Cursors.Hand;
-                CenterPoint.Now.X += x - NowPoint.X;
-                CenterPoint.Now.Y += y - NowPoint.Y;
-                UpdateDraws.UpdateDrawedMap = true;
-            }
-            else
-                //设置光标为箭头
-                this.Cursor = Cursors.Arrow;
-
-            NowPoint.X = x;
-            NowPoint.Y = y;
-
-            //显示坐标到界面
-            label_XY.Text = "X:" + x.ToString() + " Y:" + y.ToString();
-            label_True_XY.Text = "X:" + (NowPoint.X).ToString() + "CM Y:" + (NowPoint.Y).ToString() + "CM";
-
-            //重新加载界面
-            if (MapMode)
-                UpdateDraws.UpdateDrawingMap = true;
-        }
-
-        public void pictureBox_location_MouseWheel(object sender, MouseEventArgs e)
-        {
-            mouseWheel = true;
-            if (e.Delta > 0)
-            {
-                if (Grid > 5)
-                {
-                    Grid -= 5;
-                }
-                else if (Grid > 1)
-                {
-                    Grid -= 1;
-                }
-            }
-            else
-            {
-                if (Grid < 400)
-                {
-                    if (Grid < 5)
-                    {
-                        Grid += 1;
-                    }
-                    else
-                        Grid += 5;
-                }
-            }
-
-            label_Grid.Text = "Grid:" + Grid.ToString();
-
-            //根据偏差重置中心点坐标
-            if (Grid != 1 && Grid != 400)
-            {
-                CenterPoint.Now.X += (MapSize.Width / Grid / 2 - NowPoint.X) / 1;
-                CenterPoint.Now.Y += (MapSize.Height / Grid / 2 - NowPoint.Y) / 1;
-            }
-
-
-            //重绘网格
-            UpdateDraws.UpdateGrid = true;
-            //重绘线段
-            if (MapMode)
-                UpdateDraws.UpdateDrawingMap = true;
-            else
-                UpdateDraws.UpdateDrawedMap = true;
-        }
-
-        private void pictureBox_location_MouseClick(object sender, MouseEventArgs e)
-        {
-            if (MapMode == false)
-            {
-                return;
-            }
-            int x = e.X;
-            int y = MapSize.Height - e.Y;
-
-            #region 计算捕获坐标
-            //计算最近坐标点
-            int xval = x % Grid;
-            int yval = y % Grid;
-            if (xval > (Grid / 2))
-                x += Grid - xval;
-            else
-                x -= xval;
-            if (yval > (Grid / 2))
-                y += Grid - yval;
-            else
-                y -= yval;
-            #endregion
-            x = x / Grid - 1;
-            y = y / Grid - 1;
-
-            if (MapMode)
-            {
-                //计算偏差移动造成的偏差
-                x -= CenterPoint.Now.X - CenterPoint.Init.X;
-                y -= CenterPoint.Now.Y - CenterPoint.Init.Y;
-            }
-
-            NowPoint.X = x;
-            NowPoint.Y = y;
-
-            if (e.Button == MouseButtons.Left && e.Clicks == 1)
-            {
-                //单击了鼠标左键,添加坐标到坐标集合
-                DrawPointList.Add(NowPoint);
-                dataGridView_Draw.DataSource = DrawPointList.ToArray();
-                dataGridView_Draw.FirstDisplayedScrollingRowIndex = dataGridView_Draw.RowCount - 1;
-            }
-            else if (e.Button == MouseButtons.Right && e.Clicks == 1)
-            {
-                //单击了鼠标右键，退出绘图模式
-                MapMode = false;
-                UpdateDraws.UpdateDrawedMap = true;
-            }
-
-            label1.Text = DrawPointList.Count.ToString();
-            label2.Text = DrawPointListDelete.Count.ToString();
-        }
-
-        private void pictureBox_location_MouseEnter(object sender, EventArgs e)
-        {
-            //控件获取焦点后滚轮事件才有效
-            this.pictureBox_location.Focus();
-        }
-
-        private void button1_openclose_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                if (button1_openclose.Text == "打开串口")
-                {
-                    serialPort1.PortName = comboBox1_PortName.SelectedItem.ToString();
-                    serialPort1.BaudRate = int.Parse(comboBox2_BaudRate.SelectedItem.ToString());
-                    serialPort1.Open();
-                    serialPort1.DataReceived += serialPort1_DataReceived;
-                    button1_openclose.Text = "关闭串口";
-                    label5_LED.ForeColor = Color.Red;
-                }
-                else
-                {
-                    serialPort1.Close();
-                    button1_openclose.Text = "打开串口";
-                    label5_LED.ForeColor = Color.Black;
-                }
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("打开串口失败,串口被占用或选择正确的串口!", "错误提示");
-            }
-        }
-
-        private void comboBox2_BaudRate_SelectionChangeCommitted(object sender, EventArgs e)
-        {
-            serialPort1.BaudRate = int.Parse(comboBox2_BaudRate.SelectedItem.ToString());
-            //存储PortName
-            Ini.Write("串口配置", "BaudRate", comboBox2_BaudRate.SelectedIndex.ToString());
-        }
-
-        private void comboBox1_PortName_SelectionChangeCommitted(object sender, EventArgs e)
-        {
-            if (serialPort1.IsOpen)
-            {
-                serialPort1.Close();
-            }
-            try
-            {
-                serialPort1.PortName = comboBox1_PortName.SelectedItem.ToString();
-                serialPort1.Open();
-                button1_openclose.Text = "关闭串口";
-                label5_LED.ForeColor = Color.Red;
-
-                //存储PortName
-                Ini.Write("串口配置", "PortName", serialPort1.PortName);
-            }
-            catch (Exception)
-            {
-                serialPort1.Close();
-                button1_openclose.Text = "打开串口";
-                label5_LED.ForeColor = Color.Black;
-                MessageBox.Show("打开串口失败,串口被占用或选择正确的串口!", "错误提示");
-            }
-        }
-
-        private void button_loadmap_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog file = new OpenFileDialog();
-            file.Filter = "文本文件|*.xml";
-            if (file.ShowDialog() == DialogResult.OK)
-            {
-                ////清空子节点
-                //node_parment.Nodes.Clear();
-                //node_lujingparment.Nodes.Clear();
-
-                XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.Load(file.FileName);
-
-                XmlNode xn = xmlDoc.SelectSingleNode("Flash参数");
-
-                XmlNodeList xnn = xn.ChildNodes;
-
-                int j = 0;
-                foreach (XmlNode xnk in xnn)
-                {
-
-                    if (xnk.Name == "路径参数")
-                    {
-                        j = 0; DrawPointList.Clear();
-                        XmlElement xe = (XmlElement)xnk;
-                        XmlNodeList xnm = xe.ChildNodes;
-                        foreach (XmlNode xnkk in xnm)
-                        {
-                            XmlElement xee = (XmlElement)xnkk;
-                            XmlNodeList xng = xee.ChildNodes;
-                            foreach (XmlNode xnkkk in xng)
-                            {
-                                DrawPointList.Add(new Point(int.Parse(xnkkk.ChildNodes[1].ChildNodes.Item(3).InnerText.ToString()), int.Parse(xnkkk.ChildNodes[2].ChildNodes.Item(3).InnerText.ToString())));
-                            }
-                            j++;
-                        }
-                    }
-                }
-                dataGridView_Draw.DataSource = DrawPointList.ToArray();
-                //重绘地图
-                UpdateDraws.UpdateDrawedMap = true;
-            }
-        }
-
-        private void button_Clear_Click(object sender, EventArgs e)
-        {
-            //清空地图坐标，加入原点坐标
-            DrawPointList.Clear();
-            DrawPointList.Add(new Point(0, 0));
-            dataGridView_Draw.DataSource = DrawPointList.ToArray();
-
-            //清空实时坐标
-            RealTimePointList.Clear();
-            textBox_RealTimeXY.Clear();
-
-            //设置为非绘图模式
-            MapMode = false;
-            //重绘地图
-            UpdateDraws.UpdateDrawedMap = true;
-            //重绘实时位置
-            UpdateDraws.UpdateRealTimeMap = true;
-        }
-
-        //手动添加坐标
-        private void button_add_point_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                //添加点
-                int x = int.Parse(textBox_AddX.Text.Trim());
-                int y = int.Parse(textBox_AddY.Text.Trim());
-
-                DrawPointList.Add(new Point(x, y));
-                dataGridView_Draw.DataSource = DrawPointList.ToArray();
-
-                //更新界面
-                MapMode = false;
-                UpdateDraws.UpdateDrawedMap = true;
-            }
-            catch
-            {
-            }
-
-        }
-
-        private void dataGridView_Draw_RowStateChanged(object sender, DataGridViewRowStateChangedEventArgs e)
-        {
-            //显示序号在HeaderCell上
-            for (int i = 0; i < this.dataGridView_Draw.Rows.Count; i++)
-            {
-                DataGridViewRow r = this.dataGridView_Draw.Rows[i];
-                r.HeaderCell.Value = string.Format("{0}", i + 1);
-            }
-        }
-
-        private void dataGridView_DrawDelete_RowStateChanged(object sender, DataGridViewRowStateChangedEventArgs e)
-        {
-            //显示序号在HeaderCell上
-            for (int i = 0; i < this.dataGridView_DrawDelete.Rows.Count; i++)
-            {
-                DataGridViewRow r = this.dataGridView_DrawDelete.Rows[i];
-                r.HeaderCell.Value = string.Format("{0}", i + 1);
-            }
-        }
-
-        private void dataGridView_RealTimeXY_RowStateChanged(object sender, DataGridViewRowStateChangedEventArgs e)
-        {
-            //显示序号在HeaderCell上
-            //for (int i = 0; i < this.dataGridView_RealTimeXY.Rows.Count; i++)
-            //{
-            //    DataGridViewRow r = this.dataGridView_RealTimeXY.Rows[i];
-            //    r.HeaderCell.Value = string.Format("{0}", i + 1);
-            //}
-        }
-
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            //关闭实时位置绘图进程
-            ThreadRealTime.Abort();
-            //关闭网格绘制线程
-            ThreadDrawGrid.Abort();
-            //关闭画图绘制线程
-            ThreadDrawMap.Abort();
-        }
-
-        private void button_DrawRoute_Click(object sender, EventArgs e)
-        {
-            MapMode = true;
-        }
-
-        private void pictureBox_location_MouseDown(object sender, MouseEventArgs e)
-        {
-            //移动地图
-            if (e.Button == MouseButtons.Right)
-            {
-                if (MapMode == false)
-                {
-                    KeySpace = true;
-                    CenterPoint.MoveAgo.X = CenterPoint.Now.X;
-                    CenterPoint.MoveAgo.Y = CenterPoint.Now.Y;
-                }
-            }
-        }
-
-        private void pictureBox_location_MouseUp(object sender, MouseEventArgs e)
-        {
-            //移动地图
-            if (KeySpace)
-            {
-                UpdateDraws.UpdateGrid = true;
-                UpdateDraws.UpdateDrawedMap = true;
-            }
-            KeySpace = false;
-        }
-
-        //窗口尺寸变化时更新界面
-        private void Form1_Resize(object sender, EventArgs e)
-        {
-            //重绘地图
-            UpdateDraws.UpdateGrid = true;
-            UpdateDraws.UpdateRealTimeMap = true;
-            if (MapMode)
-                UpdateDraws.UpdateDrawingMap = true;
-            else
-                UpdateDraws.UpdateDrawedMap = true;
-        }
     }
 }

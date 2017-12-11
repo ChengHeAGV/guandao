@@ -35,21 +35,22 @@
             this.pictureBoxForce = new System.Windows.Forms.PictureBox();
             this.pictureBoxBackGround = new System.Windows.Forms.PictureBox();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.textBox_RealTimeXY = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
-            this.dataGridView_Draw = new System.Windows.Forms.DataGridView();
-            this.dataGridView_DrawDelete = new System.Windows.Forms.DataGridView();
-            this.label8 = new System.Windows.Forms.Label();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.buttonClearRealTime = new System.Windows.Forms.Button();
+            this.buttonSaveRealTime = new System.Windows.Forms.Button();
+            this.buttonLoadRealTime = new System.Windows.Forms.Button();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.buttonClearMap = new System.Windows.Forms.Button();
+            this.buttonSaveMap = new System.Windows.Forms.Button();
+            this.buttonLoadmap = new System.Windows.Forms.Button();
             this.button_DrawRoute = new System.Windows.Forms.Button();
             this.label10 = new System.Windows.Forms.Label();
             this.button_add_point = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
-            this.button_Clear = new System.Windows.Forms.Button();
-            this.button_loadmap = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.textBox_AddY = new System.Windows.Forms.TextBox();
-            this.button_saveRoute = new System.Windows.Forms.Button();
             this.textBox_AddX = new System.Windows.Forms.TextBox();
             this.label_True_XY = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
@@ -66,6 +67,8 @@
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.form1BindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.form1BindingSource1 = new System.Windows.Forms.BindingSource(this.components);
+            this.labelRouteLength = new System.Windows.Forms.Label();
+            this.labelRealTimeXYZ = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -77,8 +80,8 @@
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Draw)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_DrawDelete)).BeginInit();
+            this.groupBox2.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).BeginInit();
             this.splitContainer3.Panel1.SuspendLayout();
             this.splitContainer3.Panel2.SuspendLayout();
@@ -152,37 +155,25 @@
             // 
             // splitContainer2.Panel1
             // 
-            this.splitContainer2.Panel1.Controls.Add(this.textBox_RealTimeXY);
+            this.splitContainer2.Panel1.Controls.Add(this.labelRealTimeXYZ);
+            this.splitContainer2.Panel1.Controls.Add(this.labelRouteLength);
             this.splitContainer2.Panel1.Controls.Add(this.label7);
             this.splitContainer2.Panel1.Controls.Add(this.label9);
-            this.splitContainer2.Panel1.Controls.Add(this.dataGridView_Draw);
-            this.splitContainer2.Panel1.Controls.Add(this.dataGridView_DrawDelete);
-            this.splitContainer2.Panel1.Controls.Add(this.label8);
             // 
             // splitContainer2.Panel2
             // 
+            this.splitContainer2.Panel2.Controls.Add(this.groupBox2);
+            this.splitContainer2.Panel2.Controls.Add(this.groupBox1);
             this.splitContainer2.Panel2.Controls.Add(this.button_DrawRoute);
             this.splitContainer2.Panel2.Controls.Add(this.label10);
             this.splitContainer2.Panel2.Controls.Add(this.button_add_point);
             this.splitContainer2.Panel2.Controls.Add(this.label6);
-            this.splitContainer2.Panel2.Controls.Add(this.button_Clear);
-            this.splitContainer2.Panel2.Controls.Add(this.button_loadmap);
             this.splitContainer2.Panel2.Controls.Add(this.label5);
             this.splitContainer2.Panel2.Controls.Add(this.textBox_AddY);
-            this.splitContainer2.Panel2.Controls.Add(this.button_saveRoute);
             this.splitContainer2.Panel2.Controls.Add(this.textBox_AddX);
             this.splitContainer2.Size = new System.Drawing.Size(298, 728);
             this.splitContainer2.SplitterDistance = 259;
             this.splitContainer2.TabIndex = 1;
-            // 
-            // textBox_RealTimeXY
-            // 
-            this.textBox_RealTimeXY.Font = new System.Drawing.Font("宋体", 16F);
-            this.textBox_RealTimeXY.Location = new System.Drawing.Point(6, 152);
-            this.textBox_RealTimeXY.Multiline = true;
-            this.textBox_RealTimeXY.Name = "textBox_RealTimeXY";
-            this.textBox_RealTimeXY.Size = new System.Drawing.Size(280, 96);
-            this.textBox_RealTimeXY.TabIndex = 19;
             // 
             // label7
             // 
@@ -190,60 +181,105 @@
             this.label7.Font = new System.Drawing.Font("宋体", 18F);
             this.label7.Location = new System.Drawing.Point(3, 5);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(106, 24);
+            this.label7.Size = new System.Drawing.Size(118, 24);
             this.label7.TabIndex = 15;
-            this.label7.Text = "绘制坐标";
+            this.label7.Text = "路径点数:";
             this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label9
             // 
             this.label9.AutoSize = true;
             this.label9.Font = new System.Drawing.Font("宋体", 18F);
-            this.label9.Location = new System.Drawing.Point(3, 125);
+            this.label9.Location = new System.Drawing.Point(3, 43);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(106, 24);
+            this.label9.Size = new System.Drawing.Size(118, 24);
             this.label9.TabIndex = 18;
-            this.label9.Text = "实时坐标";
+            this.label9.Text = "实时坐标:";
             this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // dataGridView_Draw
+            // groupBox2
             // 
-            this.dataGridView_Draw.AllowUserToAddRows = false;
-            this.dataGridView_Draw.AllowUserToDeleteRows = false;
-            this.dataGridView_Draw.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView_Draw.Location = new System.Drawing.Point(3, 32);
-            this.dataGridView_Draw.Name = "dataGridView_Draw";
-            this.dataGridView_Draw.ReadOnly = true;
-            this.dataGridView_Draw.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-            this.dataGridView_Draw.RowTemplate.Height = 23;
-            this.dataGridView_Draw.Size = new System.Drawing.Size(292, 29);
-            this.dataGridView_Draw.TabIndex = 14;
-            this.dataGridView_Draw.RowStateChanged += new System.Windows.Forms.DataGridViewRowStateChangedEventHandler(this.dataGridView_Draw_RowStateChanged);
+            this.groupBox2.Controls.Add(this.buttonClearRealTime);
+            this.groupBox2.Controls.Add(this.buttonSaveRealTime);
+            this.groupBox2.Controls.Add(this.buttonLoadRealTime);
+            this.groupBox2.Location = new System.Drawing.Point(149, 152);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(127, 168);
+            this.groupBox2.TabIndex = 17;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "轨迹";
             // 
-            // dataGridView_DrawDelete
+            // buttonClearRealTime
             // 
-            this.dataGridView_DrawDelete.AllowUserToAddRows = false;
-            this.dataGridView_DrawDelete.AllowUserToDeleteRows = false;
-            this.dataGridView_DrawDelete.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView_DrawDelete.Location = new System.Drawing.Point(3, 91);
-            this.dataGridView_DrawDelete.Name = "dataGridView_DrawDelete";
-            this.dataGridView_DrawDelete.ReadOnly = true;
-            this.dataGridView_DrawDelete.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-            this.dataGridView_DrawDelete.RowTemplate.Height = 23;
-            this.dataGridView_DrawDelete.Size = new System.Drawing.Size(295, 31);
-            this.dataGridView_DrawDelete.TabIndex = 15;
-            this.dataGridView_DrawDelete.RowStateChanged += new System.Windows.Forms.DataGridViewRowStateChangedEventHandler(this.dataGridView_DrawDelete_RowStateChanged);
+            this.buttonClearRealTime.Location = new System.Drawing.Point(9, 20);
+            this.buttonClearRealTime.Name = "buttonClearRealTime";
+            this.buttonClearRealTime.Size = new System.Drawing.Size(98, 43);
+            this.buttonClearRealTime.TabIndex = 8;
+            this.buttonClearRealTime.Text = "清除轨迹";
+            this.buttonClearRealTime.UseVisualStyleBackColor = true;
+            this.buttonClearRealTime.Click += new System.EventHandler(this.buttonClearRealTime_Click);
             // 
-            // label8
+            // buttonSaveRealTime
             // 
-            this.label8.AutoSize = true;
-            this.label8.Font = new System.Drawing.Font("宋体", 18F);
-            this.label8.Location = new System.Drawing.Point(2, 64);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(130, 24);
-            this.label8.TabIndex = 16;
-            this.label8.Text = "删除的坐标";
-            this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.buttonSaveRealTime.Location = new System.Drawing.Point(9, 118);
+            this.buttonSaveRealTime.Name = "buttonSaveRealTime";
+            this.buttonSaveRealTime.Size = new System.Drawing.Size(98, 43);
+            this.buttonSaveRealTime.TabIndex = 2;
+            this.buttonSaveRealTime.Text = "保存轨迹";
+            this.buttonSaveRealTime.UseVisualStyleBackColor = true;
+            this.buttonSaveRealTime.Click += new System.EventHandler(this.buttonSaveRealTime_Click);
+            // 
+            // buttonLoadRealTime
+            // 
+            this.buttonLoadRealTime.Location = new System.Drawing.Point(9, 69);
+            this.buttonLoadRealTime.Name = "buttonLoadRealTime";
+            this.buttonLoadRealTime.Size = new System.Drawing.Size(97, 43);
+            this.buttonLoadRealTime.TabIndex = 7;
+            this.buttonLoadRealTime.Text = "加载轨迹";
+            this.buttonLoadRealTime.UseVisualStyleBackColor = true;
+            this.buttonLoadRealTime.Click += new System.EventHandler(this.buttonLoadRealTime_Click);
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.buttonClearMap);
+            this.groupBox1.Controls.Add(this.buttonSaveMap);
+            this.groupBox1.Controls.Add(this.buttonLoadmap);
+            this.groupBox1.Location = new System.Drawing.Point(16, 152);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(127, 168);
+            this.groupBox1.TabIndex = 16;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "地图";
+            // 
+            // buttonClearMap
+            // 
+            this.buttonClearMap.Location = new System.Drawing.Point(9, 20);
+            this.buttonClearMap.Name = "buttonClearMap";
+            this.buttonClearMap.Size = new System.Drawing.Size(98, 43);
+            this.buttonClearMap.TabIndex = 8;
+            this.buttonClearMap.Text = "清除地图";
+            this.buttonClearMap.UseVisualStyleBackColor = true;
+            this.buttonClearMap.Click += new System.EventHandler(this.button_Clear_Click);
+            // 
+            // buttonSaveMap
+            // 
+            this.buttonSaveMap.Location = new System.Drawing.Point(9, 118);
+            this.buttonSaveMap.Name = "buttonSaveMap";
+            this.buttonSaveMap.Size = new System.Drawing.Size(98, 43);
+            this.buttonSaveMap.TabIndex = 2;
+            this.buttonSaveMap.Text = "保存路径";
+            this.buttonSaveMap.UseVisualStyleBackColor = true;
+            this.buttonSaveMap.Click += new System.EventHandler(this.button_saveRoute_Click);
+            // 
+            // buttonLoadmap
+            // 
+            this.buttonLoadmap.Location = new System.Drawing.Point(9, 69);
+            this.buttonLoadmap.Name = "buttonLoadmap";
+            this.buttonLoadmap.Size = new System.Drawing.Size(97, 43);
+            this.buttonLoadmap.TabIndex = 7;
+            this.buttonLoadmap.Text = "加载路径";
+            this.buttonLoadmap.UseVisualStyleBackColor = true;
+            this.buttonLoadmap.Click += new System.EventHandler(this.button_loadmap_Click);
             // 
             // button_DrawRoute
             // 
@@ -290,28 +326,6 @@
             this.label6.Text = "Y:";
             this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // button_Clear
-            // 
-            this.button_Clear.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.button_Clear.Location = new System.Drawing.Point(0, 336);
-            this.button_Clear.Name = "button_Clear";
-            this.button_Clear.Size = new System.Drawing.Size(298, 43);
-            this.button_Clear.TabIndex = 8;
-            this.button_Clear.Text = "清除地图";
-            this.button_Clear.UseVisualStyleBackColor = true;
-            this.button_Clear.Click += new System.EventHandler(this.button_Clear_Click);
-            // 
-            // button_loadmap
-            // 
-            this.button_loadmap.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.button_loadmap.Location = new System.Drawing.Point(0, 379);
-            this.button_loadmap.Name = "button_loadmap";
-            this.button_loadmap.Size = new System.Drawing.Size(298, 43);
-            this.button_loadmap.TabIndex = 7;
-            this.button_loadmap.Text = "加载路径";
-            this.button_loadmap.UseVisualStyleBackColor = true;
-            this.button_loadmap.Click += new System.EventHandler(this.button_loadmap_Click);
-            // 
             // label5
             // 
             this.label5.AutoSize = true;
@@ -330,17 +344,6 @@
             this.textBox_AddY.Name = "textBox_AddY";
             this.textBox_AddY.Size = new System.Drawing.Size(55, 35);
             this.textBox_AddY.TabIndex = 10;
-            // 
-            // button_saveRoute
-            // 
-            this.button_saveRoute.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.button_saveRoute.Location = new System.Drawing.Point(0, 422);
-            this.button_saveRoute.Name = "button_saveRoute";
-            this.button_saveRoute.Size = new System.Drawing.Size(298, 43);
-            this.button_saveRoute.TabIndex = 2;
-            this.button_saveRoute.Text = "保存路径";
-            this.button_saveRoute.UseVisualStyleBackColor = true;
-            this.button_saveRoute.Click += new System.EventHandler(this.button_saveRoute_Click);
             // 
             // textBox_AddX
             // 
@@ -415,7 +418,7 @@
             this.label5_LED.BackColor = System.Drawing.SystemColors.Control;
             this.label5_LED.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label5_LED.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label5_LED.Location = new System.Drawing.Point(728, 23);
+            this.label5_LED.Location = new System.Drawing.Point(1028, 19);
             this.label5_LED.Name = "label5_LED";
             this.label5_LED.Size = new System.Drawing.Size(17, 12);
             this.label5_LED.TabIndex = 16;
@@ -424,7 +427,7 @@
             // button1_openclose
             // 
             this.button1_openclose.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.button1_openclose.Location = new System.Drawing.Point(761, 18);
+            this.button1_openclose.Location = new System.Drawing.Point(1061, 14);
             this.button1_openclose.Name = "button1_openclose";
             this.button1_openclose.Size = new System.Drawing.Size(96, 23);
             this.button1_openclose.TabIndex = 11;
@@ -436,7 +439,7 @@
             // 
             this.label4.AutoSize = true;
             this.label4.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label4.Location = new System.Drawing.Point(415, 22);
+            this.label4.Location = new System.Drawing.Point(715, 18);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(47, 12);
             this.label4.TabIndex = 14;
@@ -446,7 +449,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label3.Location = new System.Drawing.Point(575, 23);
+            this.label3.Location = new System.Drawing.Point(875, 19);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(47, 12);
             this.label3.TabIndex = 15;
@@ -467,7 +470,7 @@
             "115200",
             "256000",
             "921600"});
-            this.comboBox2_BaudRate.Location = new System.Drawing.Point(627, 19);
+            this.comboBox2_BaudRate.Location = new System.Drawing.Point(927, 15);
             this.comboBox2_BaudRate.Name = "comboBox2_BaudRate";
             this.comboBox2_BaudRate.Size = new System.Drawing.Size(97, 20);
             this.comboBox2_BaudRate.TabIndex = 13;
@@ -478,7 +481,7 @@
             this.comboBox1_PortName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.comboBox1_PortName.FormattingEnabled = true;
-            this.comboBox1_PortName.Location = new System.Drawing.Point(467, 18);
+            this.comboBox1_PortName.Location = new System.Drawing.Point(767, 14);
             this.comboBox1_PortName.Name = "comboBox1_PortName";
             this.comboBox1_PortName.Size = new System.Drawing.Size(97, 20);
             this.comboBox1_PortName.TabIndex = 12;
@@ -519,6 +522,28 @@
             // 
             this.form1BindingSource1.DataSource = typeof(guandao.Form1);
             // 
+            // labelRouteLength
+            // 
+            this.labelRouteLength.AutoSize = true;
+            this.labelRouteLength.Font = new System.Drawing.Font("宋体", 18F);
+            this.labelRouteLength.Location = new System.Drawing.Point(121, 5);
+            this.labelRouteLength.Name = "labelRouteLength";
+            this.labelRouteLength.Size = new System.Drawing.Size(22, 24);
+            this.labelRouteLength.TabIndex = 20;
+            this.labelRouteLength.Text = "0";
+            this.labelRouteLength.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelRealTimeXYZ
+            // 
+            this.labelRealTimeXYZ.AutoSize = true;
+            this.labelRealTimeXYZ.Font = new System.Drawing.Font("宋体", 18F);
+            this.labelRealTimeXYZ.Location = new System.Drawing.Point(121, 43);
+            this.labelRealTimeXYZ.Name = "labelRealTimeXYZ";
+            this.labelRealTimeXYZ.Size = new System.Drawing.Size(22, 24);
+            this.labelRealTimeXYZ.TabIndex = 21;
+            this.labelRealTimeXYZ.Text = "0";
+            this.labelRealTimeXYZ.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -546,8 +571,8 @@
             this.splitContainer2.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Draw)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_DrawDelete)).EndInit();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox1.ResumeLayout(false);
             this.splitContainer3.Panel1.ResumeLayout(false);
             this.splitContainer3.Panel2.ResumeLayout(false);
             this.splitContainer3.Panel2.PerformLayout();
@@ -566,7 +591,7 @@
         private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button button_saveRoute;
+        private System.Windows.Forms.Button buttonSaveMap;
         private System.Windows.Forms.SplitContainer splitContainer3;
         private System.Windows.Forms.Label label_Grid;
         private System.Windows.Forms.Label label_XY;
@@ -580,23 +605,26 @@
         private System.Windows.Forms.ComboBox comboBox2_BaudRate;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ComboBox comboBox1_PortName;
-        private System.Windows.Forms.Button button_loadmap;
-        private System.Windows.Forms.Button button_Clear;
+        private System.Windows.Forms.Button buttonLoadmap;
+        private System.Windows.Forms.Button buttonClearMap;
         private System.Windows.Forms.Button button_add_point;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox textBox_AddY;
         private System.Windows.Forms.TextBox textBox_AddX;
-        private System.Windows.Forms.DataGridView dataGridView_Draw;
         private System.Windows.Forms.BindingSource form1BindingSource;
         private System.Windows.Forms.BindingSource form1BindingSource1;
-        private System.Windows.Forms.DataGridView dataGridView_DrawDelete;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.TextBox textBox_RealTimeXY;
         private System.Windows.Forms.Button button_DrawRoute;
         private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Button buttonSaveRealTime;
+        private System.Windows.Forms.Button buttonLoadRealTime;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Button buttonClearRealTime;
+        private System.Windows.Forms.Label labelRealTimeXYZ;
+        private System.Windows.Forms.Label labelRouteLength;
     }
 }
 
