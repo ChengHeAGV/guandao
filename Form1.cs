@@ -125,7 +125,7 @@ namespace guandao
         Point NowPoint;
 
         //中心点坐标,以最小物理单位CM计数
-        private class CenterPoint
+        private class PointCenter
         {
             /// <summary>
             /// 初始化的中心坐标
@@ -141,11 +141,13 @@ namespace guandao
             public static Point MoveAgo;
         }
 
+        //
+
         //绘图模式
         bool MapMode = false;
 
         //捕获值
-        int Grid = 35;//单位，像素
+        int Grid = 25;//单位，像素
 
         //空格键按下
         bool KeySpace = false;
@@ -158,9 +160,9 @@ namespace guandao
             MapSize = pictureBoxBackGround.Size;
 
             //初始化中心点坐标,地图中心
-            CenterPoint.Init = new Point(1, 1);
-            CenterPoint.Now = CenterPoint.Init;
-            CenterPoint.MoveAgo = CenterPoint.Init;
+            PointCenter.Init = new Point(2, 2);
+            PointCenter.Now = PointCenter.Init;
+            PointCenter.MoveAgo = PointCenter.Init;
 
             //初始化坐标集合，添加原点坐标
             DrawPointList.Add(new Point(0, 0));
@@ -183,7 +185,7 @@ namespace guandao
         }
 
         //实时位置绘制
-       private void Thread_DrawRealTimePoint()
+        private void Thread_DrawRealTimePoint()
         {
             //当实时坐标变化时重新绘制
             while (true)
@@ -209,11 +211,11 @@ namespace guandao
                     {
                         for (int i = 0; i < RealTimePointList.Count - 1; i++)
                         {
-                            int Drawed_X = (int)(RealTimePointList[i].X * Grid + CenterPoint.Now.X * Grid);
-                            int Drawed_Y = (int)(MapSize.Height - RealTimePointList[i].Y * Grid - CenterPoint.Now.Y * Grid);
+                            int Drawed_X = (int)(RealTimePointList[i].X * Grid + PointCenter.Now.X * Grid);
+                            int Drawed_Y = (int)(MapSize.Height - RealTimePointList[i].Y * Grid - PointCenter.Now.Y * Grid);
 
-                            int Drawed_X1 = (int)(RealTimePointList[i + 1].X * Grid + CenterPoint.Now.X * Grid);
-                            int Drawed_Y1 = (int)(MapSize.Height - RealTimePointList[i + 1].Y * Grid - CenterPoint.Now.Y * Grid);
+                            int Drawed_X1 = (int)(RealTimePointList[i + 1].X * Grid + PointCenter.Now.X * Grid);
+                            int Drawed_Y1 = (int)(MapSize.Height - RealTimePointList[i + 1].Y * Grid - PointCenter.Now.Y * Grid);
 
                             g.DrawLine(new Pen(Color.White, 3), Drawed_X, Drawed_Y, Drawed_X1, Drawed_Y1);
                         }
@@ -226,8 +228,8 @@ namespace guandao
                         float angle = RealTimePointList[RealTimePointList.Count - 1].Z;
                         Point center = new Point();
                         Point[] point = new Point[3];
-                        center.X = (int)(RealTimePointList[RealTimePointList.Count - 1].X * Grid + CenterPoint.Now.X * Grid);
-                        center.Y = (int)(MapSize.Height - RealTimePointList[RealTimePointList.Count - 1].Y * Grid - CenterPoint.Now.Y * Grid); ;
+                        center.X = (int)(RealTimePointList[RealTimePointList.Count - 1].X * Grid + PointCenter.Now.X * Grid);
+                        center.Y = (int)(MapSize.Height - RealTimePointList[RealTimePointList.Count - 1].Y * Grid - PointCenter.Now.Y * Grid); ;
 
                         point[0].X = (int)(center.X + (float)(Math.Cos(Math.PI * (angle / 180.0)) * d));
                         point[0].Y = (int)(center.Y - (float)(Math.Sin(Math.PI * (angle / 180.0)) * d));
@@ -290,17 +292,26 @@ namespace guandao
                     pen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dot;
 
                     #region 绘制网格
+                    int x1, y1, x2, y2;
                     if (Grid >= 10)
                     {
                         //横线
                         for (int i = 0; i < (MapSize.Height) / Grid + 1; i++)
                         {
-                            g.DrawLine(pen, 0, MapSize.Height - Grid * i, MapSize.Width, MapSize.Height - Grid * i);
+                            x1 = 0 + PointMove.MovePix.X;
+                            y1 = MapSize.Height - Grid * i + PointMove.MovePix.Y;
+                            x2 = MapSize.Width/Grid*Grid + PointMove.MovePix.X;
+                            y2 = MapSize.Height - Grid * i + PointMove.MovePix.Y;
+                            g.DrawLine(pen, x1, y1, x2, y2);
                         }
                         //竖线
                         for (int i = 0; i < MapSize.Width / Grid + 1; i++)
                         {
-                            g.DrawLine(pen, Grid * i, 0, Grid * i, MapSize.Height);
+                            x1 = Grid * i + PointMove.MovePix.X;
+                            y1 = MapSize.Height%Grid + PointMove.MovePix.Y;
+                            x2 = Grid * i + PointMove.MovePix.X;
+                            y2 = MapSize.Height  + PointMove.MovePix.Y;
+                            g.DrawLine(pen, x1, y1, x2, y2);
                         }
                     }
                     #endregion
@@ -310,18 +321,18 @@ namespace guandao
                     int lineLength = 50;
 
                     //X轴
-                    g.DrawLine(pen, CenterPoint.Now.X * Grid - lineLength, MapSize.Height - CenterPoint.Now.Y * Grid, CenterPoint.Now.X * Grid + lineLength, MapSize.Height - CenterPoint.Now.Y * Grid);
+                    g.DrawLine(pen, PointCenter.Now.X * Grid - lineLength + PointMove.MovePix.X, MapSize.Height - PointCenter.Now.Y * Grid + PointMove.MovePix.Y, PointCenter.Now.X * Grid + lineLength + PointMove.MovePix.X, MapSize.Height - PointCenter.Now.Y * Grid + PointMove.MovePix.Y);
                     //箭头上部分
-                    g.DrawLine(pen, CenterPoint.Now.X * Grid + (int)(lineLength / 1.5), MapSize.Height - CenterPoint.Now.Y * Grid - lineLength / 6, CenterPoint.Now.X * Grid + lineLength, MapSize.Height - CenterPoint.Now.Y * Grid);
+                    g.DrawLine(pen, PointCenter.Now.X * Grid + (int)(lineLength / 1.5) + PointMove.MovePix.X, MapSize.Height - PointCenter.Now.Y * Grid - lineLength / 6 + PointMove.MovePix.Y, PointCenter.Now.X * Grid + lineLength + PointMove.MovePix.X, MapSize.Height - PointCenter.Now.Y * Grid + PointMove.MovePix.Y);
                     //箭头下部分
-                    g.DrawLine(pen, CenterPoint.Now.X * Grid + (int)(lineLength / 1.5), MapSize.Height - CenterPoint.Now.Y * Grid + lineLength / 6, CenterPoint.Now.X * Grid + lineLength, MapSize.Height - CenterPoint.Now.Y * Grid);
+                    g.DrawLine(pen, PointCenter.Now.X * Grid + (int)(lineLength / 1.5) + PointMove.MovePix.X, MapSize.Height - PointCenter.Now.Y * Grid + lineLength / 6 + PointMove.MovePix.Y, PointCenter.Now.X * Grid + lineLength + PointMove.MovePix.X, MapSize.Height - PointCenter.Now.Y * Grid + PointMove.MovePix.Y);
 
                     //Y轴
-                    g.DrawLine(pen, CenterPoint.Now.X * Grid, MapSize.Height - CenterPoint.Now.Y * Grid - lineLength, CenterPoint.Now.X * Grid, MapSize.Height - CenterPoint.Now.Y * Grid + lineLength);
+                    g.DrawLine(pen, PointCenter.Now.X * Grid + PointMove.MovePix.X, MapSize.Height - PointCenter.Now.Y * Grid - lineLength + PointMove.MovePix.Y, PointCenter.Now.X * Grid + PointMove.MovePix.X, MapSize.Height - PointCenter.Now.Y * Grid + lineLength + PointMove.MovePix.Y);
                     //箭头左部分
-                    g.DrawLine(pen, CenterPoint.Now.X * Grid - lineLength / 6, MapSize.Height - CenterPoint.Now.Y * Grid - (int)(lineLength / 1.5), CenterPoint.Now.X * Grid, MapSize.Height - CenterPoint.Now.Y * Grid - lineLength);
+                    g.DrawLine(pen, PointCenter.Now.X * Grid - lineLength / 6 + PointMove.MovePix.X, MapSize.Height - PointCenter.Now.Y * Grid - (int)(lineLength / 1.5) + PointMove.MovePix.Y, PointCenter.Now.X * Grid + PointMove.MovePix.X, MapSize.Height - PointCenter.Now.Y * Grid - lineLength + PointMove.MovePix.Y);
                     //箭头右部分
-                    g.DrawLine(pen, CenterPoint.Now.X * Grid + lineLength / 6, MapSize.Height - CenterPoint.Now.Y * Grid - (int)(lineLength / 1.5), CenterPoint.Now.X * Grid, MapSize.Height - CenterPoint.Now.Y * Grid - lineLength);
+                    g.DrawLine(pen, PointCenter.Now.X * Grid + lineLength / 6 + PointMove.MovePix.X, MapSize.Height - PointCenter.Now.Y * Grid - (int)(lineLength / 1.5) + PointMove.MovePix.Y, PointCenter.Now.X * Grid + PointMove.MovePix.X, MapSize.Height - PointCenter.Now.Y * Grid - lineLength + PointMove.MovePix.Y);
                     #endregion
 
                     g.Dispose();
@@ -344,8 +355,8 @@ namespace guandao
                 Thread.Sleep(20);
 
                 //当前光标位置
-                int x = NowPoint.X * Grid + CenterPoint.Now.X * Grid;
-                int y = MapSize.Height - NowPoint.Y * Grid - CenterPoint.Now.Y * Grid;
+                int x = NowPoint.X * Grid + PointCenter.Now.X * Grid ;
+                int y = MapSize.Height - NowPoint.Y * Grid - PointCenter.Now.Y * Grid ;
 
                 //临时公用坐标变量
                 //Point point = new Point(); 
@@ -374,10 +385,10 @@ namespace guandao
                     {
                         for (int i = 0; i < DrawPointList.Count - 1; i++)
                         {
-                            int Drawed_X = (int)(DrawPointList[i].X * Grid + CenterPoint.Now.X * Grid);
-                            int Drawed_Y = (int)(MapSize.Height - DrawPointList[i].Y * Grid - CenterPoint.Now.Y * Grid);
-                            int Drawed_X1 = (int)(DrawPointList[i + 1].X * Grid + CenterPoint.Now.X * Grid);
-                            int Drawed_Y1 = (int)(MapSize.Height - DrawPointList[i + 1].Y * Grid - CenterPoint.Now.Y * Grid);
+                            int Drawed_X = (int)(DrawPointList[i].X * Grid + PointCenter.Now.X * Grid) + PointMove.MovePix.X;
+                            int Drawed_Y = (int)(MapSize.Height - DrawPointList[i].Y * Grid - PointCenter.Now.Y * Grid) + PointMove.MovePix.Y;
+                            int Drawed_X1 = (int)(DrawPointList[i + 1].X * Grid + PointCenter.Now.X * Grid) + PointMove.MovePix.X;
+                            int Drawed_Y1 = (int)(MapSize.Height - DrawPointList[i + 1].Y * Grid - PointCenter.Now.Y * Grid) + PointMove.MovePix.Y;
 
                             //画已经绘制的线段
                             g.DrawLine(new Pen(Color.White, 2), Drawed_X, Drawed_Y, Drawed_X1, Drawed_Y1);
@@ -390,8 +401,8 @@ namespace guandao
                     //画正在绘制的线段
                     if (DrawPointList.Count >= 1)
                     {
-                        int Drawed_X = (int)(DrawPointList[DrawPointList.Count - 1].X * Grid + CenterPoint.Now.X * Grid);
-                        int Drawed_Y = (int)(MapSize.Height - DrawPointList[DrawPointList.Count - 1].Y * Grid - CenterPoint.Now.Y * Grid);
+                        int Drawed_X = (int)(DrawPointList[DrawPointList.Count - 1].X * Grid + PointCenter.Now.X * Grid) + PointMove.MovePix.X;
+                        int Drawed_Y = (int)(MapSize.Height - DrawPointList[DrawPointList.Count - 1].Y * Grid - PointCenter.Now.Y * Grid) + PointMove.MovePix.Y;
                         g.DrawLine(new Pen(Color.White, 2), Drawed_X, Drawed_Y, x, y);
                     }
                     g.Dispose();
@@ -418,10 +429,10 @@ namespace guandao
                     {
                         for (int i = 0; i < DrawPointList.Count - 1; i++)
                         {
-                            int Drawed_X = (int)(DrawPointList[i].X * Grid + CenterPoint.Now.X * Grid);
-                            int Drawed_Y = (int)(MapSize.Height - DrawPointList[i].Y * Grid - CenterPoint.Now.Y * Grid);
-                            int Drawed_X1 = (int)(DrawPointList[i + 1].X * Grid + CenterPoint.Now.X * Grid);
-                            int Drawed_Y1 = (int)(MapSize.Height - DrawPointList[i + 1].Y * Grid - CenterPoint.Now.Y * Grid);
+                            int Drawed_X = (int)(DrawPointList[i].X * Grid + PointCenter.Now.X * Grid) + PointMove.MovePix.X;
+                            int Drawed_Y = (int)(MapSize.Height - DrawPointList[i].Y * Grid - PointCenter.Now.Y * Grid) + PointMove.MovePix.Y;
+                            int Drawed_X1 = (int)(DrawPointList[i + 1].X * Grid + PointCenter.Now.X * Grid) + PointMove.MovePix.X;
+                            int Drawed_Y1 = (int)(MapSize.Height - DrawPointList[i + 1].Y * Grid - PointCenter.Now.Y * Grid) + PointMove.MovePix.Y;
 
                             if (mouseWheel)
                             {
@@ -443,8 +454,8 @@ namespace guandao
                         //画最后一个点
                         if (Grid >= 10)
                         {
-                            int Drawed_X2 = (int)(DrawPointList[DrawPointList.Count - 1].X * Grid + CenterPoint.Now.X * Grid);
-                            int Drawed_Y2 = (int)(MapSize.Height - DrawPointList[DrawPointList.Count - 1].Y * Grid - CenterPoint.Now.Y * Grid);
+                            int Drawed_X2 = (int)(DrawPointList[DrawPointList.Count - 1].X * Grid + PointCenter.Now.X * Grid) + PointMove.MovePix.X;
+                            int Drawed_Y2 = (int)(MapSize.Height - DrawPointList[DrawPointList.Count - 1].Y * Grid - PointCenter.Now.Y * Grid) + PointMove.MovePix.Y;
                             g.FillEllipse(bush, Drawed_X2 - r, Drawed_Y2 - r, 2 * r, 2 * r);
                         }
                     }
@@ -453,8 +464,8 @@ namespace guandao
                     {
                         //在拐点处画圆
                         int i = DrawPointList.Count - 1;
-                        int Drawed_X = (int)(DrawPointList[i].X * Grid + CenterPoint.Now.X * Grid);
-                        int Drawed_Y = (int)(MapSize.Height - DrawPointList[i].Y * Grid - CenterPoint.Now.Y * Grid);
+                        int Drawed_X = (int)(DrawPointList[i].X * Grid + PointCenter.Now.X * Grid) + PointMove.MovePix.X;
+                        int Drawed_Y = (int)(MapSize.Height - DrawPointList[i].Y * Grid - PointCenter.Now.Y * Grid) + PointMove.MovePix.Y;
                         if (mouseWheel)
                             g.FillEllipse(bush, Drawed_X - r, Drawed_Y - r, 2 * r, 2 * r);
                         else
@@ -469,8 +480,8 @@ namespace guandao
                         int Drawed_Y;
                         if (DrawPointList.Count > 0)
                         {
-                            Drawed_X = (int)(DrawPointList[0].X * Grid + CenterPoint.Now.X * Grid);
-                            Drawed_Y = (int)(MapSize.Height - DrawPointList[0].Y * Grid - CenterPoint.Now.Y * Grid);
+                            Drawed_X = (int)(DrawPointList[0].X * Grid + PointCenter.Now.X * Grid);
+                            Drawed_Y = (int)(MapSize.Height - DrawPointList[0].Y * Grid - PointCenter.Now.Y * Grid);
                         }
                         else
                         {
@@ -478,8 +489,8 @@ namespace guandao
                             Drawed_Y = (int)(MapSize.Height - (NowPoint.Y + 1) * Grid);
                         }
 
-                        int Drawed_X1 = (int)(CenterPoint.MoveAgo.X * Grid);
-                        int Drawed_Y1 = (int)(MapSize.Height - CenterPoint.MoveAgo.Y * Grid);
+                        int Drawed_X1 = (int)(PointCenter.MoveAgo.X * Grid);
+                        int Drawed_Y1 = (int)(MapSize.Height - PointCenter.MoveAgo.Y * Grid);
 
                         g.DrawLine(new Pen(Color.White, 1), Drawed_X, Drawed_Y, Drawed_X1, Drawed_Y1);
                     }
@@ -517,8 +528,7 @@ namespace guandao
                     else
                         UpdateDraws.UpdateDrawedMap = true;
 
-                    label1.Text = DrawPointList.Count.ToString();
-                    label2.Text = DrawPointListDelete.Count.ToString();
+                    labelRouteLength.Text = DrawPointList.Count.ToString();
                 }
             }
             else if (e.KeyCode == Keys.Escape)
@@ -536,18 +546,17 @@ namespace guandao
                     DrawPointListDelete.Add(DrawPointList[DrawPointList.Count - 1]);
                     //删除最后一个坐标
                     DrawPointList.RemoveAt(DrawPointList.Count - 1);
-                   
+
                     //更新路径长度显示
                     labelRouteLength.Text = DrawPointList.Count.ToString();
-                    
+
                     //重绘界面
                     if (MapMode)
                         UpdateDraws.UpdateDrawingMap = true;
                     else
                         UpdateDraws.UpdateDrawedMap = true;
 
-                    label1.Text = DrawPointList.Count.ToString();
-                    label2.Text = DrawPointListDelete.ToString();
+                    labelRouteLength.Text = DrawPointList.Count.ToString();
                 }
             }
         }
@@ -629,7 +638,7 @@ namespace guandao
                             this.Invoke(new MethodInvoker(delegate
                             {
                                 //显示
-                                labelRealTimeXYZ.Text = string.Format("X:{0}Y:{1}Z:{2}",x,y,j);
+                                labelRealTimeXYZ.Text = string.Format("X:{0}Y:{1}Z:{2}", x, y, j);
                             }));
                         }
                     }
@@ -639,6 +648,18 @@ namespace guandao
                     MessageBox.Show(ex.ToString());
                 }
             }
+        }
+
+
+        private class PointMove
+        {
+            //移动的像素点
+            public static Point MovePix = new Point(0, 0);
+            //当前光标位置，像素位置
+            public static Point NowAirrowPix = new Point(0, 0);
+
+            //第一次
+            public static bool First = true;
         }
 
         private void pictureBox_location_MouseMove(object sender, MouseEventArgs e)
@@ -665,30 +686,39 @@ namespace guandao
             if (MapMode)
             {
                 //计算偏差移动造成的偏差
-                x -= CenterPoint.Now.X - CenterPoint.Init.X;
-                y -= CenterPoint.Now.Y - CenterPoint.Init.Y;
+                x -= PointCenter.Now.X - PointCenter.Init.X;
+                y -= PointCenter.Now.Y - PointCenter.Init.Y;
             }
 
             //空格键按下了
             if (KeySpace)
             {
-                //设置光标为手型
-                this.Cursor = Cursors.Hand;
-                CenterPoint.Now.X += x - NowPoint.X;
-                CenterPoint.Now.Y += y - NowPoint.Y;
+                if (PointMove.First)
+                {
+                    PointMove.First = false;
+
+                    PointMove.NowAirrowPix.X = e.X;
+                    PointMove.NowAirrowPix.Y = MapSize.Height - e.Y;
+                }
+
+                PointMove.MovePix.X -= PointMove.NowAirrowPix.X - e.X;
+                PointMove.MovePix.Y += PointMove.NowAirrowPix.Y - (MapSize.Height - e.Y);
+
+                labelTest.Text = string.Format("X:{0},Y:{1}", PointMove.MovePix.X, PointMove.MovePix.Y);
+
+                PointMove.NowAirrowPix.X = e.X;
+                PointMove.NowAirrowPix.Y = MapSize.Height - e.Y;
+
                 UpdateDraws.UpdateDrawedMap = true;
-                UpdateDraws.UpdateRealTimeMap = true;
+               // UpdateDraws.UpdateRealTimeMap = true;
+                UpdateDraws.UpdateGrid = true;
             }
-            else
-                //设置光标为箭头
-                this.Cursor = Cursors.Arrow;
 
             NowPoint.X = x;
             NowPoint.Y = y;
 
             //显示坐标到界面
             label_XY.Text = "X:" + x.ToString() + " Y:" + y.ToString();
-            label_True_XY.Text = "X:" + (NowPoint.X).ToString() + "CM Y:" + (NowPoint.Y).ToString() + "CM";
 
             //重新加载界面
             if (MapMode)
@@ -727,8 +757,8 @@ namespace guandao
             //根据偏差重置中心点坐标
             if (Grid != 1 && Grid != 400)
             {
-                CenterPoint.Now.X += (MapSize.Width / Grid / 2 - NowPoint.X) / 1;
-                CenterPoint.Now.Y += (MapSize.Height / Grid / 2 - NowPoint.Y) / 1;
+                PointCenter.Now.X += (MapSize.Width / Grid / 2 - NowPoint.X) / 1;
+                PointCenter.Now.Y += (MapSize.Height / Grid / 2 - NowPoint.Y) / 1;
             }
 
             //重绘网格
@@ -770,8 +800,8 @@ namespace guandao
             if (MapMode)
             {
                 //计算偏差移动造成的偏差
-                x -= CenterPoint.Now.X - CenterPoint.Init.X;
-                y -= CenterPoint.Now.Y - CenterPoint.Init.Y;
+                x -= PointCenter.Now.X - PointCenter.Init.X;
+                y -= PointCenter.Now.Y - PointCenter.Init.Y;
             }
 
             NowPoint.X = x;
@@ -790,8 +820,7 @@ namespace guandao
                 UpdateDraws.UpdateDrawedMap = true;
             }
 
-            label1.Text = DrawPointList.Count.ToString();
-            label2.Text = DrawPointListDelete.Count.ToString();
+            labelRouteLength.Text = DrawPointList.Count.ToString();
         }
 
         private void pictureBox_location_MouseEnter(object sender, EventArgs e)
@@ -913,8 +942,11 @@ namespace guandao
                 if (MapMode == false)
                 {
                     KeySpace = true;
-                    CenterPoint.MoveAgo.X = CenterPoint.Now.X;
-                    CenterPoint.MoveAgo.Y = CenterPoint.Now.Y;
+                    PointMove.First = true;
+                    //设置光标为手型
+                    this.Cursor = Cursors.Hand;
+                    PointCenter.MoveAgo.X = PointCenter.Now.X;
+                    PointCenter.MoveAgo.Y = PointCenter.Now.Y;
                 }
             }
         }
@@ -928,6 +960,8 @@ namespace guandao
                 UpdateDraws.UpdateDrawedMap = true;
             }
             KeySpace = false;
+            //设置光标为箭头
+            this.Cursor = Cursors.Arrow;
         }
 
         //窗口尺寸变化时更新界面
@@ -950,7 +984,7 @@ namespace guandao
             //清空实时坐标
             RealTimePointList.Clear();
             labelRealTimeXYZ.Text = "X:0 Y:0 Z:0";
-            
+
             //重绘实时位置
             UpdateDraws.UpdateRealTimeMap = true;
         }

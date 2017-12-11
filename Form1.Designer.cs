@@ -35,6 +35,8 @@
             this.pictureBoxForce = new System.Windows.Forms.PictureBox();
             this.pictureBoxBackGround = new System.Windows.Forms.PictureBox();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.labelRealTimeXYZ = new System.Windows.Forms.Label();
+            this.labelRouteLength = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -52,9 +54,6 @@
             this.label5 = new System.Windows.Forms.Label();
             this.textBox_AddY = new System.Windows.Forms.TextBox();
             this.textBox_AddX = new System.Windows.Forms.TextBox();
-            this.label_True_XY = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.label5_LED = new System.Windows.Forms.Label();
             this.button1_openclose = new System.Windows.Forms.Button();
@@ -67,8 +66,7 @@
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.form1BindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.form1BindingSource1 = new System.Windows.Forms.BindingSource(this.components);
-            this.labelRouteLength = new System.Windows.Forms.Label();
-            this.labelRealTimeXYZ = new System.Windows.Forms.Label();
+            this.labelTest = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -168,12 +166,35 @@
             this.splitContainer2.Panel2.Controls.Add(this.label10);
             this.splitContainer2.Panel2.Controls.Add(this.button_add_point);
             this.splitContainer2.Panel2.Controls.Add(this.label6);
+            this.splitContainer2.Panel2.Controls.Add(this.labelTest);
             this.splitContainer2.Panel2.Controls.Add(this.label5);
             this.splitContainer2.Panel2.Controls.Add(this.textBox_AddY);
             this.splitContainer2.Panel2.Controls.Add(this.textBox_AddX);
             this.splitContainer2.Size = new System.Drawing.Size(298, 728);
             this.splitContainer2.SplitterDistance = 259;
             this.splitContainer2.TabIndex = 1;
+            // 
+            // labelRealTimeXYZ
+            // 
+            this.labelRealTimeXYZ.AutoSize = true;
+            this.labelRealTimeXYZ.Font = new System.Drawing.Font("宋体", 18F);
+            this.labelRealTimeXYZ.Location = new System.Drawing.Point(121, 43);
+            this.labelRealTimeXYZ.Name = "labelRealTimeXYZ";
+            this.labelRealTimeXYZ.Size = new System.Drawing.Size(22, 24);
+            this.labelRealTimeXYZ.TabIndex = 21;
+            this.labelRealTimeXYZ.Text = "0";
+            this.labelRealTimeXYZ.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelRouteLength
+            // 
+            this.labelRouteLength.AutoSize = true;
+            this.labelRouteLength.Font = new System.Drawing.Font("宋体", 18F);
+            this.labelRouteLength.Location = new System.Drawing.Point(121, 5);
+            this.labelRouteLength.Name = "labelRouteLength";
+            this.labelRouteLength.Size = new System.Drawing.Size(22, 24);
+            this.labelRouteLength.TabIndex = 20;
+            this.labelRouteLength.Text = "0";
+            this.labelRouteLength.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label7
             // 
@@ -353,37 +374,6 @@
             this.textBox_AddX.Size = new System.Drawing.Size(55, 35);
             this.textBox_AddX.TabIndex = 9;
             // 
-            // label_True_XY
-            // 
-            this.label_True_XY.AutoSize = true;
-            this.label_True_XY.Font = new System.Drawing.Font("宋体", 18F);
-            this.label_True_XY.Location = new System.Drawing.Point(207, 12);
-            this.label_True_XY.Name = "label_True_XY";
-            this.label_True_XY.Size = new System.Drawing.Size(166, 24);
-            this.label_True_XY.TabIndex = 5;
-            this.label_True_XY.Text = "X:8888 Y:8888";
-            this.label_True_XY.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("宋体", 20F);
-            this.label1.Location = new System.Drawing.Point(1208, 9);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(96, 27);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "label1";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("宋体", 20F);
-            this.label2.Location = new System.Drawing.Point(1363, 9);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(96, 27);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "label2";
-            // 
             // splitContainer3
             // 
             this.splitContainer3.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -400,14 +390,11 @@
             this.splitContainer3.Panel2.Controls.Add(this.label5_LED);
             this.splitContainer3.Panel2.Controls.Add(this.button1_openclose);
             this.splitContainer3.Panel2.Controls.Add(this.label4);
-            this.splitContainer3.Panel2.Controls.Add(this.label_True_XY);
             this.splitContainer3.Panel2.Controls.Add(this.label3);
             this.splitContainer3.Panel2.Controls.Add(this.comboBox2_BaudRate);
             this.splitContainer3.Panel2.Controls.Add(this.comboBox1_PortName);
             this.splitContainer3.Panel2.Controls.Add(this.label_Grid);
             this.splitContainer3.Panel2.Controls.Add(this.label_XY);
-            this.splitContainer3.Panel2.Controls.Add(this.label2);
-            this.splitContainer3.Panel2.Controls.Add(this.label1);
             this.splitContainer3.Size = new System.Drawing.Size(1471, 777);
             this.splitContainer3.SplitterDistance = 728;
             this.splitContainer3.TabIndex = 1;
@@ -490,20 +477,20 @@
             // label_Grid
             // 
             this.label_Grid.AutoSize = true;
-            this.label_Grid.Font = new System.Drawing.Font("宋体", 12F);
-            this.label_Grid.Location = new System.Drawing.Point(131, 18);
+            this.label_Grid.Font = new System.Drawing.Font("宋体", 16F);
+            this.label_Grid.Location = new System.Drawing.Point(172, 18);
             this.label_Grid.Name = "label_Grid";
-            this.label_Grid.Size = new System.Drawing.Size(56, 16);
+            this.label_Grid.Size = new System.Drawing.Size(76, 22);
             this.label_Grid.TabIndex = 4;
             this.label_Grid.Text = "Grid:5";
             // 
             // label_XY
             // 
             this.label_XY.AutoSize = true;
-            this.label_XY.Font = new System.Drawing.Font("宋体", 12F);
+            this.label_XY.Font = new System.Drawing.Font("宋体", 16F);
             this.label_XY.Location = new System.Drawing.Point(13, 18);
             this.label_XY.Name = "label_XY";
-            this.label_XY.Size = new System.Drawing.Size(112, 16);
+            this.label_XY.Size = new System.Drawing.Size(153, 22);
             this.label_XY.TabIndex = 2;
             this.label_XY.Text = "X:8888 Y:8888";
             this.label_XY.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -522,27 +509,16 @@
             // 
             this.form1BindingSource1.DataSource = typeof(guandao.Form1);
             // 
-            // labelRouteLength
+            // labelTest
             // 
-            this.labelRouteLength.AutoSize = true;
-            this.labelRouteLength.Font = new System.Drawing.Font("宋体", 18F);
-            this.labelRouteLength.Location = new System.Drawing.Point(121, 5);
-            this.labelRouteLength.Name = "labelRouteLength";
-            this.labelRouteLength.Size = new System.Drawing.Size(22, 24);
-            this.labelRouteLength.TabIndex = 20;
-            this.labelRouteLength.Text = "0";
-            this.labelRouteLength.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // labelRealTimeXYZ
-            // 
-            this.labelRealTimeXYZ.AutoSize = true;
-            this.labelRealTimeXYZ.Font = new System.Drawing.Font("宋体", 18F);
-            this.labelRealTimeXYZ.Location = new System.Drawing.Point(121, 43);
-            this.labelRealTimeXYZ.Name = "labelRealTimeXYZ";
-            this.labelRealTimeXYZ.Size = new System.Drawing.Size(22, 24);
-            this.labelRealTimeXYZ.TabIndex = 21;
-            this.labelRealTimeXYZ.Text = "0";
-            this.labelRealTimeXYZ.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelTest.AutoSize = true;
+            this.labelTest.Font = new System.Drawing.Font("宋体", 18F);
+            this.labelTest.Location = new System.Drawing.Point(44, 361);
+            this.labelTest.Name = "labelTest";
+            this.labelTest.Size = new System.Drawing.Size(58, 24);
+            this.labelTest.TabIndex = 11;
+            this.labelTest.Text = "TEST";
+            this.labelTest.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // Form1
             // 
@@ -589,13 +565,10 @@
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.PictureBox pictureBoxBackGround;
         private System.Windows.Forms.SplitContainer splitContainer2;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button buttonSaveMap;
         private System.Windows.Forms.SplitContainer splitContainer3;
         private System.Windows.Forms.Label label_Grid;
         private System.Windows.Forms.Label label_XY;
-        private System.Windows.Forms.Label label_True_XY;
         private System.Windows.Forms.PictureBox pictureBox_location;
         private System.IO.Ports.SerialPort serialPort1;
         private System.Windows.Forms.PictureBox pictureBoxForce;
@@ -625,6 +598,7 @@
         private System.Windows.Forms.Button buttonClearRealTime;
         private System.Windows.Forms.Label labelRealTimeXYZ;
         private System.Windows.Forms.Label labelRouteLength;
+        private System.Windows.Forms.Label labelTest;
     }
 }
 
