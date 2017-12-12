@@ -51,6 +51,7 @@
             this.label10 = new System.Windows.Forms.Label();
             this.button_add_point = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
+            this.labelTest = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.textBox_AddY = new System.Windows.Forms.TextBox();
             this.textBox_AddX = new System.Windows.Forms.TextBox();
@@ -66,7 +67,6 @@
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.form1BindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.form1BindingSource1 = new System.Windows.Forms.BindingSource(this.components);
-            this.labelTest = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -347,6 +347,17 @@
             this.label6.Text = "Y:";
             this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // labelTest
+            // 
+            this.labelTest.AutoSize = true;
+            this.labelTest.Font = new System.Drawing.Font("宋体", 18F);
+            this.labelTest.Location = new System.Drawing.Point(44, 361);
+            this.labelTest.Name = "labelTest";
+            this.labelTest.Size = new System.Drawing.Size(58, 24);
+            this.labelTest.TabIndex = 11;
+            this.labelTest.Text = "TEST";
+            this.labelTest.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // label5
             // 
             this.label5.AutoSize = true;
@@ -509,17 +520,6 @@
             // 
             this.form1BindingSource1.DataSource = typeof(guandao.Form1);
             // 
-            // labelTest
-            // 
-            this.labelTest.AutoSize = true;
-            this.labelTest.Font = new System.Drawing.Font("宋体", 18F);
-            this.labelTest.Location = new System.Drawing.Point(44, 361);
-            this.labelTest.Name = "labelTest";
-            this.labelTest.Size = new System.Drawing.Size(58, 24);
-            this.labelTest.TabIndex = 11;
-            this.labelTest.Text = "TEST";
-            this.labelTest.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -529,7 +529,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "惯性导航AGV调度系统V1.0";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
