@@ -497,11 +497,21 @@ namespace guandao
                         g.DrawLine(new Pen(Color.White, 1), Drawed_X, Drawed_Y, Drawed_X1, Drawed_Y1);
                     }
 
+                    
+
                     mouseWheel = false;
                     g.Dispose();
                     this.Invoke(new MethodInvoker(delegate
                     {
+
                         pictureBoxForce.Image = bmp;
+                        //显示光标相对坐标
+                        int Drawed_X = (int)(NowPoint.X * Grid + PointCenter.Now.X * Grid) + PointMove.MovePix.X;
+                        int Drawed_Y = (int)(MapSize.Height - NowPoint.Y * Grid - PointCenter.Now.Y * Grid) + PointMove.MovePix.Y;
+
+                        labelTest.Text = string.Format("X:{0},Y:{1}", Drawed_X, Drawed_Y);
+
+
                     }));
                     GC.Collect();
                 }
@@ -746,7 +756,7 @@ namespace guandao
                 PointMove.MovePix.X -= PointMove.NowAirrowPix.X - e.X;
                 PointMove.MovePix.Y += PointMove.NowAirrowPix.Y - (MapSize.Height - e.Y);
 
-                labelTest.Text = string.Format("X:{0},Y:{1}", PointMove.MovePix.X, PointMove.MovePix.Y);
+                //labelTest.Text = string.Format("X:{0},Y:{1}", PointMove.MovePix.X, PointMove.MovePix.Y);
 
                 PointMove.NowAirrowPix.X = e.X;
                 PointMove.NowAirrowPix.Y = MapSize.Height - e.Y;
@@ -769,8 +779,6 @@ namespace guandao
 
         public void pictureBox_location_MouseWheel(object sender, MouseEventArgs e)
         {
-            int x = e.X;
-            int y = MapSize.Height - e.Y;
             int grid = Grid;
             mouseWheel = true;
             if (e.Delta < 0)
@@ -798,46 +806,17 @@ namespace guandao
             }
 
             label_Grid.Text = "Grid:" + Grid.ToString();
-            #region 计算捕获坐标
-            //计算最近坐标点
-            int xval = x % Grid;
-            int yval = y % Grid;
-            if (xval > (Grid / 2))
-                x += Grid - xval;
-            else
-                x -= xval;
-            if (yval > (Grid / 2))
-                y += Grid - yval;
-            else
-                y -= yval;
-            #endregion
-            x = x / Grid - 1;
-            y = y / Grid - 1;
-
-            // if (MapMode)
-            // {
-            //计算偏差移动造成的偏差
-            x -= PointCenter.Now.X - PointCenter.Init.X + 1;
-            y -= PointCenter.Now.Y - PointCenter.Init.Y + 1;
 
             //根据偏差重置中心点坐标
-            if (Grid != 1 && Grid != 400)
+            if (Grid > 1 && Grid != 400)
             {
-                //Drawed_X = (int)(DrawPointList[0].X * Grid + PointCenter.Now.X * Grid);
-                //Drawed_Y = (int)(MapSize.Height - DrawPointList[0].Y * Grid - PointCenter.Now.Y * Grid);
-                //光标在地图的坐标
-                int x1 = (PointCenter.Now.X + PointAir.X) * grid + PointMove.MovePix.X;
-                int y1 = MapSize.Height - (PointCenter.Now.Y + PointAir.Y) * grid ;
-                //光标缩放后的坐标
-                int x2 = (PointCenter.Now.X + x) * Grid + PointMove.MovePix.X;
-                int y2 = MapSize.Height - (PointCenter.Now.Y + y) * Grid ;
+                int x1 = (int)(NowPoint.X * grid + PointCenter.Now.X * grid) + PointMove.MovePix.X;
+                int y1 = (int)(MapSize.Height - NowPoint.Y * grid - PointCenter.Now.Y * grid) + PointMove.MovePix.Y;
+                int x2 = (int)(NowPoint.X * Grid + PointCenter.Now.X * Grid) + PointMove.MovePix.X;
+                int y2 = (int)(MapSize.Height - NowPoint.Y * Grid - PointCenter.Now.Y * Grid) + PointMove.MovePix.Y;
 
-                //PointCenter.Now.X -= Grid - grid;
-                //PointCenter.Now.Y += Grid - grid;
-                PointMove.MovePix.X += x2 - x1 ;
-                PointMove.MovePix.Y+=y2 - y1;
-                //PointCenter.Now.X *= grid / Grid;
-                //PointCenter.Now.Y *= grid / Grid;
+                PointMove.MovePix.X += x1 - x2;
+                PointMove.MovePix.Y += y1 - y2;
             }
 
             //重绘网格
